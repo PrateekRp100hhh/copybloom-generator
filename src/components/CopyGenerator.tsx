@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Wand2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { generateCopy } from '@/lib/ai';
 
 // Mock campaign types
 const campaignTypes = [
@@ -42,7 +43,7 @@ const CopyGenerator: React.FC = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const generateCopy = () => {
+  const generateCopyHandler = async () => {
     // Validate form
     if (!formData.campaignType || !formData.audience || !formData.message || !formData.tone || !formData.cta) {
       toast({
@@ -55,52 +56,24 @@ const CopyGenerator: React.FC = () => {
 
     setLoading(true);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Mock response based on inputs
-      const response = mockAIResponse(formData);
+    try {
+      // Call the AI service to generate copy
+      const response = await generateCopy(formData);
       setGeneratedCopy(response);
-      setLoading(false);
       toast({
         title: "Copy generated!",
         description: "Your marketing copy has been successfully created.",
       });
-    }, 1500);
-  };
-
-  // Function to generate mock AI response
-  const mockAIResponse = (data: typeof formData) => {
-    // Simple templating based on input
-    const { campaignType, audience, message, tone, cta } = data;
-    
-    let copy = '';
-    
-    // Different templates based on campaign type and tone
-    if (campaignType === 'landing') {
-      if (tone === 'professional') {
-        copy = `Introducing the perfect solution for ${audience}. ${message} Our industry-leading approach ensures you get the results you need. ${cta}`;
-      } else if (tone === 'friendly') {
-        copy = `Hey there! If you're ${audience}, we have something special for you. ${message} It's that simple! ${cta}`;
-      } else if (tone === 'persuasive') {
-        copy = `Don't miss this opportunity. As a ${audience}, you deserve better. ${message} The results speak for themselves. ${cta} before this offer expires.`;
-      } else if (tone === 'urgent') {
-        copy = `URGENT: ${audience} need to act now! ${message} Time is running out! ${cta} today!`;
-      } else if (tone === 'humorous') {
-        copy = `Well, well, well... look who needs ${message}. If you're ${audience} and tired of the same old solutions, we've got you covered. ${cta} (we promise it won't hurt).`;
-      } else {
-        copy = `For ${audience}: ${message}. ${cta}`;
-      }
-    } else if (campaignType === 'email') {
-      copy = `Subject: ${message}\n\nDear ${audience},\n\nWe understand your needs and have the perfect solution. ${message} designed specifically for people like you.\n\n${cta}\n\nBest regards,\nThe CopyBloom Team`;
-    } else if (campaignType === 'social') {
-      copy = `📣 Attention ${audience}! ${message} #GameChanger #Innovation\n\n${cta}`;
-    } else if (campaignType === 'ad') {
-      copy = `[${message}]\nPerfect for ${audience}.\n${cta}`;
-    } else {
-      copy = `${message} - For ${audience}. ${cta}`;
+    } catch (error) {
+      console.error('Error generating copy:', error);
+      toast({
+        title: "Generation failed",
+        description: "There was an error generating your copy. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-    
-    return copy;
   };
 
   return (
@@ -173,7 +146,7 @@ const CopyGenerator: React.FC = () => {
         </div>
 
         <Button 
-          onClick={generateCopy} 
+          onClick={generateCopyHandler} 
           className="w-full"
           disabled={loading}
         >

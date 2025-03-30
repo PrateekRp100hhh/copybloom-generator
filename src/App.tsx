@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import Generator from "./pages/Generator";
 import Templates from "./pages/Templates";
 import About from "./pages/About";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/generator" element={<Generator />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/about" element={<About />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
