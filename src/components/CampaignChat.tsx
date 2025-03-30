@@ -27,8 +27,13 @@ const CampaignChat = () => {
       
       // Add AI response to chat
       setChatHistory(prev => [...prev, { type: 'ai', content: response }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error chatting with AI:', error);
+      // Add error message to chat
+      setChatHistory(prev => [...prev, { 
+        type: 'ai', 
+        content: "I'm having trouble connecting right now. Please try again in a moment." 
+      }]);
       toast({
         title: "Error",
         description: "Failed to get response from AI assistant",
