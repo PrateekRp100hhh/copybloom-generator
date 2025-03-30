@@ -49,18 +49,31 @@ const CampaignChat = () => {
   
   return (
     <Card className="w-full">
-      <CardHeader>
+      <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5" />
           Marketing Assistant
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="h-[300px] overflow-y-auto mb-4 space-y-4 p-4 border rounded-md">
+      <CardContent className="p-4">
+        <div className="h-[400px] overflow-y-auto mb-4 space-y-4 p-4 border rounded-md">
           {chatHistory.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              <p>Start a conversation with your marketing assistant.</p>
-              <p className="text-sm">Ask questions about your campaign or get copy suggestions.</p>
+              <p className="text-lg font-medium mb-2">How can I help with your marketing?</p>
+              <div className="grid gap-2 max-w-md mx-auto mt-4">
+                <div className="rounded-md bg-muted p-2 text-sm cursor-pointer hover:bg-muted/80" 
+                  onClick={() => setMessage("Can you help me craft an email for product launch?")}>
+                  💼 Help me craft an email for product launch
+                </div>
+                <div className="rounded-md bg-muted p-2 text-sm cursor-pointer hover:bg-muted/80"
+                  onClick={() => setMessage("Write a social media post about our summer discount")}>
+                  🏷️ Generate social post for summer discount
+                </div>
+                <div className="rounded-md bg-muted p-2 text-sm cursor-pointer hover:bg-muted/80"
+                  onClick={() => setMessage("Give me ideas for improving conversion rate")}>
+                  📈 Ideas for improving conversion rate
+                </div>
+              </div>
             </div>
           ) : (
             chatHistory.map((chat, index) => (
@@ -99,7 +112,7 @@ const CampaignChat = () => {
       <CardFooter className="flex flex-col gap-4">
         <div className="flex w-full items-center gap-2">
           <Textarea 
-            placeholder="Ask about your marketing campaign..." 
+            placeholder="Ask me about marketing strategies, content ideas, or editing suggestions..." 
             className="flex-1"
             value={message}
             onChange={(e) => setMessage(e.target.value)}

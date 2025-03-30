@@ -56,35 +56,9 @@ const Dashboard = () => {
             </div>
           )}
           
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6">
+            {/* Marketing Assistant (Now First) */}
             <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>
-                  Create new content or manage existing campaigns
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button className="w-full justify-start" onClick={() => navigate('/generator')}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Create New Copy
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <History className="mr-2 h-4 w-4" />
-                  View History
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Account Settings
-                </Button>
-                <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/templates')}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Templates
-                </Button>
-              </CardContent>
-            </Card>
-            
-            <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle>Marketing Assistant</CardTitle>
                 <CardDescription>
@@ -112,39 +86,66 @@ const Dashboard = () => {
                 </Tabs>
               </CardContent>
             </Card>
-          </div>
           
-          <div className="mt-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Campaigns</CardTitle>
-                <CardDescription>
-                  View and edit your recent marketing campaigns
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentCampaigns.map(campaign => (
-                    <div key={campaign.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">{campaign.name}</h3>
-                        <p className="text-sm text-muted-foreground">Created: {campaign.date}</p>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                  <CardDescription>
+                    Create new content or manage existing campaigns
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button className="w-full justify-start" onClick={() => navigate('/generator')}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create New Copy
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <History className="mr-2 h-4 w-4" />
+                    View History
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Account Settings
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/templates')}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Templates
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Recent Campaigns</CardTitle>
+                  <CardDescription>
+                    View and edit your recent marketing campaigns
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {recentCampaigns.map(campaign => (
+                      <div key={campaign.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <h3 className="font-medium">{campaign.name}</h3>
+                          <p className="text-sm text-muted-foreground">Created: {campaign.date}</p>
+                        </div>
+                        <Button variant="outline" size="sm">View</Button>
                       </div>
-                      <Button variant="outline" size="sm">View</Button>
-                    </div>
-                  ))}
-                  
-                  {recentCampaigns.length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <p>No recent campaigns found</p>
-                      <Button variant="link" className="mt-2" onClick={() => navigate('/generator')}>
-                        Create your first campaign
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                    
+                    {recentCampaigns.length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p>No recent campaigns found</p>
+                        <Button variant="link" className="mt-2" onClick={() => navigate('/generator')}>
+                          Create your first campaign
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </main>

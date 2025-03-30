@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles } from 'lucide-react'; // Add Sparkles import here
+import { ArrowRight, Sparkles, MessageSquare } from 'lucide-react'; 
 import { Link } from 'react-router-dom';
 import CopyGenerator from '@/components/CopyGenerator';
 
@@ -32,9 +32,12 @@ const Index = () => {
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </Link>
-                  <Button variant="outline" size="lg">
-                    View Templates
-                  </Button>
+                  <Link to="/chat">
+                    <Button variant="secondary" size="lg">
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Chat with AI
+                    </Button>
+                  </Link>
                 </div>
               </div>
               <div className="lg:pl-10">
