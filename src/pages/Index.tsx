@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react'; // Add Sparkles import here
 import { Link } from 'react-router-dom';
 import CopyGenerator from '@/components/CopyGenerator';
 
