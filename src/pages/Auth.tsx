@@ -1,255 +1,217 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
 import { Sparkles } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { login, signup } from '@/lib/auth';
+import { toast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
-  // Form state for login
+  const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({
     email: '',
-    password: '',
+    password: ''
   });
-
-  // Form state for signup
   const [signupData, setSignupData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
+    confirmPassword: ''
   });
 
-  // Handle login form changes
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
-
-  // Handle signup form changes
-  const handleSignupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSignupData({ ...signupData, [e.target.name]: e.target.value });
-  };
-
-  // Handle login submission
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Basic validation
+    
     if (!loginData.email || !loginData.password) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields",
-        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
       });
-      setLoading(false);
       return;
     }
-
-    // Mock authentication - in a real app, this would call an API
-    setTimeout(() => {
-      // Store user info in localStorage for persistence
-      localStorage.setItem('user', JSON.stringify({ 
-        email: loginData.email,
-        name: loginData.email.split('@')[0],
-        isLoggedIn: true
-      }));
-      
+    
+    setIsLoading(true);
+    
+    try {
+      await login(loginData.email, loginData.password);
       toast({
-        title: "Login successful",
-        description: "Welcome back to CopyBloom!",
+        title: "Success",
+        description: "You have been logged in successfully",
       });
-      
-      setLoading(false);
       navigate('/dashboard');
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Error logging in",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Handle signup submission
-  const handleSignupSubmit = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Basic validation
+    
     if (!signupData.name || !signupData.email || !signupData.password || !signupData.confirmPassword) {
       toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields",
-        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
       });
-      setLoading(false);
       return;
     }
-
+    
     if (signupData.password !== signupData.confirmPassword) {
       toast({
-        title: "Passwords don't match",
-        description: "Please make sure your passwords match",
-        variant: "destructive",
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive"
       });
-      setLoading(false);
       return;
     }
-
-    // Mock signup - in a real app, this would call an API
-    setTimeout(() => {
-      // Store user info in localStorage for persistence
-      localStorage.setItem('user', JSON.stringify({ 
-        email: signupData.email,
-        name: signupData.name,
-        isLoggedIn: true
-      }));
-      
+    
+    setIsLoading(true);
+    
+    try {
+      await signup(signupData.name, signupData.email, signupData.password);
       toast({
         title: "Account created",
-        description: "Welcome to CopyBloom!",
+        description: "Your account has been created successfully",
       });
-      
-      setLoading(false);
       navigate('/dashboard');
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: "Error creating account",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="py-4 border-b">
-        <div className="container flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-brand-purple" />
-            <span className="text-xl font-bold gradient-text">CopyBloom</span>
-          </div>
-        </div>
-      </div>
+      <Header />
       
-      <main className="flex-1 py-16">
-        <div className="container px-4 md:px-6">
-          <div className="max-w-md mx-auto">
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Welcome to CopyBloom</CardTitle>
-                <CardDescription>
-                  Sign in to access your AI-powered marketing tools
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="login" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="login">Login</TabsTrigger>
-                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="login">
-                    <form onSubmit={handleLoginSubmit} className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="login-email">Email</Label>
-                        <Input 
-                          id="login-email" 
-                          name="email" 
-                          type="email" 
-                          placeholder="your@email.com"
-                          value={loginData.email}
-                          onChange={handleLoginChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="login-password">Password</Label>
-                        <Input 
-                          id="login-password" 
-                          name="password" 
-                          type="password" 
-                          placeholder="••••••••"
-                          value={loginData.password}
-                          onChange={handleLoginChange}
-                          required
-                        />
-                      </div>
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
-                        disabled={loading}
-                      >
-                        {loading ? 'Logging in...' : 'Login'}
-                      </Button>
-                    </form>
-                  </TabsContent>
-                  
-                  <TabsContent value="signup">
-                    <form onSubmit={handleSignupSubmit} className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-name">Full Name</Label>
-                        <Input 
-                          id="signup-name" 
-                          name="name" 
-                          type="text" 
-                          placeholder="John Doe"
-                          value={signupData.name}
-                          onChange={handleSignupChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-email">Email</Label>
-                        <Input 
-                          id="signup-email" 
-                          name="email" 
-                          type="email" 
-                          placeholder="your@email.com"
-                          value={signupData.email}
-                          onChange={handleSignupChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-password">Password</Label>
-                        <Input 
-                          id="signup-password" 
-                          name="password" 
-                          type="password" 
-                          placeholder="••••••••"
-                          value={signupData.password}
-                          onChange={handleSignupChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                        <Input 
-                          id="signup-confirm-password" 
-                          name="confirmPassword" 
-                          type="password" 
-                          placeholder="••••••••"
-                          value={signupData.confirmPassword}
-                          onChange={handleSignupChange}
-                          required
-                        />
-                      </div>
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
-                        disabled={loading}
-                      >
-                        {loading ? 'Creating Account...' : 'Sign Up'}
-                      </Button>
-                    </form>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-              <CardFooter className="flex justify-center border-t pt-4">
-                <p className="text-sm text-muted-foreground">
-                  By continuing, you agree to our Terms of Service and Privacy Policy
-                </p>
-              </CardFooter>
-            </Card>
-          </div>
-        </div>
+      <main className="flex-1 flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-center mb-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Sparkles className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center">Welcome to CopyBloom</CardTitle>
+            <CardDescription className="text-center">
+              Sign in to your account or create a new one
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Login</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="login">
+                <form onSubmit={handleLogin} className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="your.email@example.com" 
+                      value={loginData.email}
+                      onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <a href="#" className="text-xs text-primary hover:underline">
+                        Forgot password?
+                      </a>
+                    </div>
+                    <Input 
+                      id="password" 
+                      type="password"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Logging in..." : "Sign In"}
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignup} className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input 
+                      id="name" 
+                      placeholder="John Doe" 
+                      value={signupData.name}
+                      onChange={(e) => setSignupData({...signupData, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input 
+                      id="signup-email" 
+                      type="email" 
+                      placeholder="your.email@example.com" 
+                      value={signupData.email}
+                      onChange={(e) => setSignupData({...signupData, email: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <Input 
+                      id="signup-password" 
+                      type="password"
+                      value={signupData.password}
+                      onChange={(e) => setSignupData({...signupData, password: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input 
+                      id="confirm-password" 
+                      type="password"
+                      value={signupData.confirmPassword}
+                      onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+          <CardFooter className="justify-center">
+            <p className="text-sm text-muted-foreground">
+              By continuing, you agree to our Terms of Service and Privacy Policy
+            </p>
+          </CardFooter>
+        </Card>
       </main>
     </div>
   );
