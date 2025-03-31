@@ -2,20 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, History, Settings, MessageSquare, Copy, Trash2, Edit } from 'lucide-react';
+import { PlusCircle, History, Settings, MessageSquare, Copy, Trash2, Edit, ChevronDown, ChevronUp } from 'lucide-react';
 import { Campaign, getUserCampaigns, saveCampaign } from '@/lib/auth';
 import CopyGenerator from '@/components/CopyGenerator';
 import CampaignChat from '@/components/CampaignChat';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
   
   useEffect(() => {
     // Load user campaigns from localStorage
@@ -47,6 +50,23 @@ const Dashboard = () => {
       month: 'short', 
       day: 'numeric' 
     });
+  };
+
+  const handleDeleteCampaign = (id: string) => {
+    // In a real app, this would make an API call
+    // For now, we'll just update the local state
+    setCampaigns(prev => prev.filter(campaign => campaign.id !== id));
+    if (selectedCampaign?.id === id) {
+      setSelectedCampaign(null);
+    }
+    toast({
+      title: "Campaign deleted",
+      description: "Your campaign has been deleted successfully"
+    });
+  };
+
+  const handleViewCampaign = (campaign: Campaign) => {
+    setSelectedCampaign(campaign);
   };
 
   return (
@@ -92,6 +112,110 @@ const Dashboard = () => {
                   </TabsContent>
                 </Tabs>
               </CardContent>
+            </Card>
+            
+            {/* History Feature (New) */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center">
+                    <History className="mr-2 h-5 w-5" />
+                    Campaign History
+                  </CardTitle>
+                  <CardDescription>
+                    View all your past marketing campaigns
+                  </CardDescription>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setShowHistory(!showHistory)}
+                >
+                  {showHistory ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </CardHeader>
+              
+              {showHistory && (
+                <CardContent>
+                  {campaigns.length > 0 ? (
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Created</TableHead>
+                            <TableHead className="w-[100px]">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {campaigns.map((campaign) => (
+                            <TableRow key={campaign.id}>
+                              <TableCell className="font-medium">{campaign.name}</TableCell>
+                              <TableCell>{formatDate(campaign.date)}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleViewCampaign(campaign)}
+                                    title="View"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => handleDeleteCampaign(campaign.id)}
+                                    title="Delete"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No campaigns found</p>
+                      <Button variant="link" className="mt-2" onClick={() => navigate('/generator')}>
+                        Create your first campaign
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              )}
+              
+              {selectedCampaign && (
+                <CardContent className="border-t pt-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium">{selectedCampaign.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Created: {formatDate(selectedCampaign.date)}
+                      </p>
+                    </div>
+                    <div className="rounded-md border p-4 bg-muted/50">
+                      <pre className="whitespace-pre-wrap break-words text-sm">{selectedCampaign.content}</pre>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedCampaign(null)}
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              )}
             </Card>
           
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -144,10 +268,20 @@ const Dashboard = () => {
                           <p className="text-sm text-muted-foreground">Created: {formatDate(campaign.date)}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="icon" title="Edit">
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            title="Edit"
+                            onClick={() => handleViewCampaign(campaign)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="outline" size="icon" title="Delete">
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            title="Delete"
+                            onClick={() => handleDeleteCampaign(campaign.id)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

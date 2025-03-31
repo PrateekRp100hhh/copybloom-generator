@@ -1,3 +1,4 @@
+
 // A simple auth implementation using localStorage
 // In a production app, this would connect to a real authentication service
 
@@ -142,6 +143,22 @@ export const getUserCampaigns = (): Campaign[] => {
   
   const allCampaigns = getCampaignsFromStorage();
   return allCampaigns.filter(c => c.userId === user.id);
+};
+
+// Delete a campaign by ID
+export const deleteCampaign = (id: string): boolean => {
+  const user = getCurrentUser();
+  if (!user) return false;
+  
+  const campaigns = getCampaignsFromStorage();
+  const updatedCampaigns = campaigns.filter(c => c.id !== id);
+  
+  if (updatedCampaigns.length === campaigns.length) {
+    return false; // No campaign was deleted
+  }
+  
+  localStorage.setItem('campaigns', JSON.stringify(updatedCampaigns));
+  return true;
 };
 
 // Helper functions
