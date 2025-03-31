@@ -1,4 +1,3 @@
-
 // A simple auth implementation using localStorage
 // In a production app, this would connect to a real authentication service
 
@@ -172,7 +171,6 @@ const getCampaignsFromStorage = (): Campaign[] => {
   return campaigns ? JSON.parse(campaigns) : [];
 };
 
-// Helper function to generate a pseudo-random user ID
 const generateUserId = (): string => {
   return Math.random().toString(36).substring(2, 15) + 
          Math.random().toString(36).substring(2, 15);
