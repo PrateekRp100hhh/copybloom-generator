@@ -1,47 +1,53 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, History, Settings, MessageSquare, Copy } from 'lucide-react';
-import { isAuthenticated, getCurrentUser } from '@/lib/auth';
+import { PlusCircle, History, Settings, MessageSquare, Copy, Trash2, Edit } from 'lucide-react';
+import { Campaign, getUserCampaigns, saveCampaign } from '@/lib/auth';
 import CopyGenerator from '@/components/CopyGenerator';
 import CampaignChat from '@/components/CampaignChat';
 import { toast } from '@/hooks/use-toast';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   
   useEffect(() => {
-    // Check authentication
-    if (!isAuthenticated()) {
+    // Load user campaigns from localStorage
+    const userCampaigns = getUserCampaigns();
+    setCampaigns(userCampaigns);
+  }, []);
+
+  const handleSaveCampaign = (name: string, content: string) => {
+    try {
+      const newCampaign = saveCampaign({ name, content });
+      setCampaigns(prev => [...prev, newCampaign]);
       toast({
-        title: "Authentication required",
-        description: "Please login to access the dashboard",
+        title: "Campaign saved",
+        description: "Your campaign has been saved successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving campaign",
+        description: "Failed to save your campaign",
         variant: "destructive"
       });
-      navigate('/auth');
-      return;
     }
-    
-    // Get user data
-    setUser(getCurrentUser());
-  }, [navigate]);
+  };
 
-  const recentCampaigns = [
-    { id: 1, name: "Summer Sale Email", date: "2023-06-15" },
-    { id: 2, name: "Product Launch Page", date: "2023-05-28" },
-    { id: 3, name: "Holiday Newsletter", date: "2023-04-10" }
-  ];
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -81,7 +87,7 @@ const Dashboard = () => {
                     <CampaignChat />
                   </TabsContent>
                   <TabsContent value="generate" className="mt-4">
-                    <CopyGenerator />
+                    <CopyGenerator onSave={handleSaveCampaign} />
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -100,9 +106,9 @@ const Dashboard = () => {
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Create New Copy
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <History className="mr-2 h-4 w-4" />
-                    View History
+                  <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/chat')}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Chat Assistant
                   </Button>
                   <Button variant="outline" className="w-full justify-start">
                     <Settings className="mr-2 h-4 w-4" />
@@ -116,27 +122,40 @@ const Dashboard = () => {
               </Card>
               
               <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle>Recent Campaigns</CardTitle>
-                  <CardDescription>
-                    View and edit your recent marketing campaigns
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Your Campaigns</CardTitle>
+                    <CardDescription>
+                      View and edit your saved marketing campaigns
+                    </CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => navigate('/generator')}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    New
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentCampaigns.map(campaign => (
+                    {campaigns.map(campaign => (
                       <div key={campaign.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <h3 className="font-medium">{campaign.name}</h3>
-                          <p className="text-sm text-muted-foreground">Created: {campaign.date}</p>
+                        <div className="overflow-hidden">
+                          <h3 className="font-medium truncate">{campaign.name}</h3>
+                          <p className="text-sm text-muted-foreground">Created: {formatDate(campaign.date)}</p>
                         </div>
-                        <Button variant="outline" size="sm">View</Button>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="icon" title="Edit">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="icon" title="Delete">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                     
-                    {recentCampaigns.length === 0 && (
+                    {campaigns.length === 0 && (
                       <div className="text-center py-8 text-muted-foreground">
-                        <p>No recent campaigns found</p>
+                        <p>No campaigns found</p>
                         <Button variant="link" className="mt-2" onClick={() => navigate('/generator')}>
                           Create your first campaign
                         </Button>

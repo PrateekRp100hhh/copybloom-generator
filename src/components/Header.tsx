@@ -1,27 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Menu, X } from 'lucide-react';
-
-interface User {
-  name: string;
-  email: string;
-  isLoggedIn: boolean;
-}
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, logout, isAuthenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -55,19 +42,26 @@ const Header = () => {
           <Link to="/" className="text-sm font-medium hover:text-brand-purple transition-colors">
             Home
           </Link>
-          <Link to="/templates" className="text-sm font-medium hover:text-brand-purple transition-colors">
-            Templates
-          </Link>
-          <Link to="/generator" className="text-sm font-medium hover:text-brand-purple transition-colors">
-            Generator
-          </Link>
+          {isAuthenticated && (
+            <>
+              <Link to="/templates" className="text-sm font-medium hover:text-brand-purple transition-colors">
+                Templates
+              </Link>
+              <Link to="/generator" className="text-sm font-medium hover:text-brand-purple transition-colors">
+                Generator
+              </Link>
+              <Link to="/chat" className="text-sm font-medium hover:text-brand-purple transition-colors">
+                Chat
+              </Link>
+            </>
+          )}
           <Link to="/about" className="text-sm font-medium hover:text-brand-purple transition-colors">
             About
           </Link>
         </nav>
         
         <div className="hidden md:flex items-center gap-2">
-          {user ? (
+          {isAuthenticated ? (
             <>
               <Button 
                 variant="outline" 
@@ -78,11 +72,7 @@ const Header = () => {
               </Button>
               <Button 
                 size="sm"
-                onClick={() => {
-                  localStorage.removeItem('user');
-                  setUser(null);
-                  navigate('/');
-                }}
+                onClick={logout}
               >
                 Logout
               </Button>
@@ -117,20 +107,31 @@ const Header = () => {
               >
                 Home
               </Link>
-              <Link 
-                to="/templates" 
-                className="text-sm font-medium py-2" 
-                onClick={() => setMenuOpen(false)}
-              >
-                Templates
-              </Link>
-              <Link 
-                to="/generator" 
-                className="text-sm font-medium py-2" 
-                onClick={() => setMenuOpen(false)}
-              >
-                Generator
-              </Link>
+              {isAuthenticated && (
+                <>
+                  <Link 
+                    to="/templates" 
+                    className="text-sm font-medium py-2" 
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Templates
+                  </Link>
+                  <Link 
+                    to="/generator" 
+                    className="text-sm font-medium py-2" 
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Generator
+                  </Link>
+                  <Link 
+                    to="/chat" 
+                    className="text-sm font-medium py-2" 
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Chat
+                  </Link>
+                </>
+              )}
               <Link 
                 to="/about" 
                 className="text-sm font-medium py-2" 
@@ -140,7 +141,7 @@ const Header = () => {
               </Link>
               
               <div className="pt-2 border-t">
-                {user ? (
+                {isAuthenticated ? (
                   <div className="flex flex-col gap-2">
                     <Button 
                       variant="outline" 
@@ -153,9 +154,7 @@ const Header = () => {
                     </Button>
                     <Button 
                       onClick={() => {
-                        localStorage.removeItem('user');
-                        setUser(null);
-                        navigate('/');
+                        logout();
                         setMenuOpen(false);
                       }}
                     >

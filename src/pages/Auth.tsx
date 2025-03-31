@@ -1,19 +1,17 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sparkles } from 'lucide-react';
-import { login, signup } from '@/lib/auth';
+import { Sparkles, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, signup, isLoading } = useAuth();
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -37,23 +35,11 @@ const Auth = () => {
       return;
     }
     
-    setIsLoading(true);
-    
     try {
       await login(loginData.email, loginData.password);
-      toast({
-        title: "Success",
-        description: "You have been logged in successfully",
-      });
-      navigate('/dashboard');
     } catch (error) {
-      toast({
-        title: "Error logging in",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+      // Error handling is done in AuthContext
+      console.error("Login failed", error);
     }
   };
 
@@ -78,23 +64,11 @@ const Auth = () => {
       return;
     }
     
-    setIsLoading(true);
-    
     try {
       await signup(signupData.name, signupData.email, signupData.password);
-      toast({
-        title: "Account created",
-        description: "Your account has been created successfully",
-      });
-      navigate('/dashboard');
     } catch (error) {
-      toast({
-        title: "Error creating account",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+      // Error handling is done in AuthContext
+      console.error("Signup failed", error);
     }
   };
 
@@ -151,7 +125,12 @@ const Auth = () => {
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Sign In"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : "Sign In"}
                   </Button>
                 </form>
               </TabsContent>
@@ -200,7 +179,12 @@ const Auth = () => {
                     />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creating Account..." : "Create Account"}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : "Create Account"}
                   </Button>
                 </form>
               </TabsContent>
