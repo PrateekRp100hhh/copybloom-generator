@@ -87,7 +87,8 @@ const Dashboard = () => {
                     <CampaignChat />
                   </TabsContent>
                   <TabsContent value="generate" className="mt-4">
-                    <CopyGenerator onSave={handleSaveCampaign} />
+                    {/* Remove the onSave prop since it's not supported by the component */}
+                    <CopyGenerator />
                   </TabsContent>
                 </Tabs>
               </CardContent>
