@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Wand2, AlertCircle } from 'lucide-react';
+import { Wand2, AlertCircle, ClipboardCopy, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateCopy } from '@/lib/ai';
 
@@ -81,6 +81,18 @@ const CopyGenerator: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      campaignType: '',
+      audience: '',
+      message: '',
+      tone: '',
+      cta: '',
+    });
+    setGeneratedCopy(null);
+    setError(null);
   };
 
   return (
@@ -158,25 +170,30 @@ const CopyGenerator: React.FC = () => {
           </div>
         </div>
 
-        <Button 
-          onClick={generateCopyHandler} 
-          className="w-full"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="flex items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Generating...
-            </span>
-          ) : (
-            <span className="flex items-center">
-              <Wand2 className="mr-2 h-5 w-5" /> Generate Copy
-            </span>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={generateCopyHandler} 
+            className="flex-1"
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                <Wand2 className="mr-2 h-5 w-5" /> Generate Copy
+              </span>
+            )}
+          </Button>
+          <Button variant="outline" onClick={resetForm} disabled={loading}>
+            <RefreshCw className="h-4 w-4 mr-2" /> Reset
+          </Button>
+        </div>
       </div>
 
       {generatedCopy && (
@@ -200,7 +217,7 @@ const CopyGenerator: React.FC = () => {
                 description: "Your marketing copy has been copied to your clipboard.",
               });
             }}>
-              Copy to Clipboard
+              <ClipboardCopy className="h-4 w-4 mr-2" /> Copy to Clipboard
             </Button>
           </div>
         </div>

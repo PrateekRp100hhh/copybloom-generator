@@ -51,8 +51,8 @@ export const generateCopy = async (params: GenerateCopyParams): Promise<string> 
     
     console.log('Sending prompt to Gemini:', prompt);
     
-    // Use the gemini-pro model (correct model name without version)
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Use the correct model name (gemini-1.5-flash)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -70,8 +70,8 @@ export const chatWithAI = async (params: ChatMessageParams): Promise<string> => 
   const { message } = params;
   
   try {
-    // Use the gemini-pro model for chat (correct model name without version)
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Use the correct model name (gemini-1.5-flash)
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     // Create a chat instance
     const chat = model.startChat({

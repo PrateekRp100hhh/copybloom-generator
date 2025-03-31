@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bot, SendIcon, RefreshCcw } from "lucide-react";
+import { Bot, SendIcon, RefreshCcw, AlertCircle } from "lucide-react";
 import { chatWithAI } from '@/lib/ai';
 import { toast } from '@/hooks/use-toast';
 
 const CampaignChat = () => {
   const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'ai', content: string}>>([]);
+  const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'ai' | 'error', content: string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [apiAvailable, setApiAvailable] = useState(true);
   
@@ -33,7 +33,7 @@ const CampaignChat = () => {
       console.error('Error chatting with AI:', error);
       // Add error message to chat
       setChatHistory(prev => [...prev, { 
-        type: 'ai', 
+        type: 'error', 
         content: "I'm having trouble connecting right now. Please try again in a moment." 
       }]);
       setApiAvailable(false);
@@ -62,8 +62,8 @@ const CampaignChat = () => {
           <Bot className="h-5 w-5" />
           Marketing Assistant
           {!apiAvailable && (
-            <div className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full ml-auto">
-              API Issues
+            <div className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full ml-auto flex items-center gap-1">
+              <AlertCircle className="h-3 w-3" /> API Issues
             </div>
           )}
         </CardTitle>
@@ -98,9 +98,12 @@ const CampaignChat = () => {
                   className={`max-w-[80%] rounded-lg px-4 py-2 ${
                     chat.type === 'user' 
                       ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted'
+                      : chat.type === 'error'
+                        ? 'bg-destructive/10 text-destructive border border-destructive/20'
+                        : 'bg-muted'
                   }`}
                 >
+                  {chat.type === 'error' && <AlertCircle className="h-4 w-4 mb-1" />}
                   {chat.content}
                 </div>
               </div>
