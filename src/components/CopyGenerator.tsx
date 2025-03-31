@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Wand2 } from 'lucide-react';
+import { Wand2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateCopy } from '@/lib/ai';
 
@@ -30,6 +30,7 @@ const tones = [
 const CopyGenerator: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     campaignType: '',
     audience: '',
@@ -41,6 +42,8 @@ const CopyGenerator: React.FC = () => {
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user makes changes
+    if (error) setError(null);
   };
 
   const generateCopyHandler = async () => {
@@ -55,20 +58,24 @@ const CopyGenerator: React.FC = () => {
     }
 
     setLoading(true);
+    setError(null);
     
     try {
       // Call the AI service to generate copy
+      console.log("Calling generateCopy with:", formData);
       const response = await generateCopy(formData);
+      console.log("Received response:", response);
       setGeneratedCopy(response);
       toast({
         title: "Copy generated!",
         description: "Your marketing copy has been successfully created.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating copy:', error);
+      setError(error.message || "Generation failed");
       toast({
         title: "Generation failed",
-        description: "There was an error generating your copy. Please try again.",
+        description: error.message || "There was an error generating your copy. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -79,6 +86,12 @@ const CopyGenerator: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Generate Marketing Copy</h2>
+      {error && (
+        <div className="bg-destructive/10 text-destructive p-3 rounded-md mb-4 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4" />
+          <span>{error}</span>
+        </div>
+      )}
       <div className="space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">

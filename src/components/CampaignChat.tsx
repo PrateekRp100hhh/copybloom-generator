@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ const CampaignChat = () => {
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'ai', content: string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [apiAvailable, setApiAvailable] = useState(true);
   
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -27,6 +28,7 @@ const CampaignChat = () => {
       
       // Add AI response to chat
       setChatHistory(prev => [...prev, { type: 'ai', content: response }]);
+      setApiAvailable(true);
     } catch (error: any) {
       console.error('Error chatting with AI:', error);
       // Add error message to chat
@@ -34,9 +36,10 @@ const CampaignChat = () => {
         type: 'ai', 
         content: "I'm having trouble connecting right now. Please try again in a moment." 
       }]);
+      setApiAvailable(false);
       toast({
         title: "Error",
-        description: "Failed to get response from AI assistant",
+        description: `Failed to get response: ${error.message}`,
         variant: "destructive"
       });
     } finally {
@@ -58,6 +61,11 @@ const CampaignChat = () => {
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5" />
           Marketing Assistant
+          {!apiAvailable && (
+            <div className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full ml-auto">
+              API Issues
+            </div>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
@@ -127,6 +135,7 @@ const CampaignChat = () => {
                 handleSendMessage();
               }
             }}
+            disabled={isLoading}
           />
           <Button 
             size="icon" 
