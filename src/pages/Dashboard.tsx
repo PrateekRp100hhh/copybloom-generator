@@ -18,7 +18,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-  const [showHistory, setShowHistory] = useState(true); // Change default to true to show history by default
+  const [showHistory, setShowHistory] = useState(true); // Show history by default
   
   useEffect(() => {
     // Load user campaigns from localStorage
@@ -106,7 +106,7 @@ const Dashboard = () => {
                   variant="outline" 
                   size="icon" 
                   className="ml-auto" 
-                  title="View History"
+                  title="Toggle History"
                   onClick={toggleHistory}
                 >
                   <History className="h-5 w-5" />
