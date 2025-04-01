@@ -5,13 +5,20 @@ import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, History, Settings, MessageSquare, Copy, Trash2, Edit, ChevronDown, ChevronUp } from 'lucide-react';
+import { PlusCircle, History, Settings, MessageSquare, Copy, Trash2, Edit, ChevronDown, ChevronUp, Youtube } from 'lucide-react';
 import { Campaign, getUserCampaigns, saveCampaign, deleteCampaign } from '@/lib/auth';
 import CopyGenerator from '@/components/CopyGenerator';
 import CampaignChat from '@/components/CampaignChat';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { 
+  Menubar, 
+  MenubarContent, 
+  MenubarItem, 
+  MenubarMenu, 
+  MenubarTrigger 
+} from '@/components/ui/menubar';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -82,6 +89,47 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      
+      {/* Navigation Menubar */}
+      <div className="border-b bg-background">
+        <div className="container px-4 md:px-6">
+          <Menubar className="border-none px-0">
+            <MenubarMenu>
+              <MenubarTrigger className="font-medium">Create</MenubarTrigger>
+              <MenubarContent>
+                <MenubarItem onClick={() => navigate('/generator')}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Marketing Copy
+                </MenubarItem>
+                <MenubarItem onClick={() => navigate('/youtube-script')}>
+                  <Youtube className="mr-2 h-4 w-4" />
+                  YouTube Script
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu>
+              <MenubarTrigger className="font-medium">
+                <History className="mr-2 h-4 w-4" />
+                History
+              </MenubarTrigger>
+              <MenubarContent>
+                {campaigns.length > 0 ? (
+                  campaigns.slice(0, 5).map((campaign) => (
+                    <MenubarItem key={campaign.id} onClick={() => handleViewCampaign(campaign)}>
+                      {campaign.name}
+                    </MenubarItem>
+                  ))
+                ) : (
+                  <MenubarItem disabled>No history found</MenubarItem>
+                )}
+                <MenubarItem onClick={() => setShowHistory(!showHistory)}>
+                  {showHistory ? 'Hide History' : 'Show History'}
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+          </Menubar>
+        </div>
+      </div>
       
       <main className="flex-1 py-8">
         <div className="container px-4 md:px-6">
@@ -249,6 +297,10 @@ const Dashboard = () => {
                   <Button className="w-full justify-start" onClick={() => navigate('/generator')}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Create New Copy
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/youtube-script')}>
+                    <Youtube className="mr-2 h-4 w-4" />
+                    YouTube Script
                   </Button>
                   <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/chat')}>
                     <MessageSquare className="mr-2 h-4 w-4" />

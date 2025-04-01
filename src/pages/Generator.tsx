@@ -1,14 +1,28 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import CopyGenerator from '@/components/CopyGenerator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Youtube } from 'lucide-react';
+import { Youtube, History } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { getUserCampaigns, Campaign } from '@/lib/auth';
 
 const Generator = () => {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [showHistory, setShowHistory] = useState(true);
+
+  useEffect(() => {
+    // Load user campaigns from localStorage
+    const userCampaigns = getUserCampaigns();
+    setCampaigns(userCampaigns);
+  }, []);
+
+  const toggleHistory = () => {
+    setShowHistory(!showHistory);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -16,7 +30,18 @@ const Generator = () => {
       <main className="flex-1 py-8">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">AI Copy Generator</h1>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold">AI Copy Generator</h1>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={toggleHistory} 
+                title="Toggle History"
+                className="ml-4"
+              >
+                <History className="h-5 w-5" />
+              </Button>
+            </div>
             
             <div className="mb-6 bg-muted/30 rounded-lg p-4 border border-dashed flex items-center justify-between">
               <div className="flex items-center">
@@ -30,6 +55,48 @@ const Generator = () => {
                 <Button variant="secondary">Try it now</Button>
               </Link>
             </div>
+            
+            {showHistory && campaigns.length > 0 && (
+              <div className="mb-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <History className="h-5 w-5 mr-2" />
+                        Recent Campaigns
+                      </CardTitle>
+                      <CardDescription>
+                        Your recently created campaigns
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="max-h-64 overflow-y-auto">
+                      {campaigns.slice(0, 5).map((campaign) => (
+                        <div key={campaign.id} className="border-b last:border-b-0 py-2 flex justify-between items-center">
+                          <div>
+                            <h3 className="font-medium">{campaign.name}</h3>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(campaign.date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Link to="/dashboard">
+                            <Button variant="ghost" size="sm">View</Button>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-2 text-right">
+                      <Link to="/dashboard">
+                        <Button variant="link" size="sm">
+                          View all campaigns
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
             
             <Tabs defaultValue="generator" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
@@ -76,9 +143,10 @@ const Generator = () => {
                         imgSrc="https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
                       />
                       <TemplateCard 
-                        title="Product Launch"
-                        description="Perfect for new product announcements"
+                        title="YouTube Script"
+                        description="Professional script template for viral videos"
                         imgSrc="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
+                        link="/youtube-script"
                       />
                       <TemplateCard 
                         title="Newsletter"
@@ -116,14 +184,16 @@ const Generator = () => {
 const TemplateCard = ({ 
   title, 
   description, 
-  imgSrc
+  imgSrc,
+  link
 }: { 
   title: string; 
   description: string; 
   imgSrc: string;
+  link?: string;
 }) => {
-  return (
-    <div className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+  const Content = () => (
+    <>
       <div className="relative h-36 overflow-hidden">
         <img 
           src={imgSrc} 
@@ -135,6 +205,18 @@ const TemplateCard = ({
         <h3 className="font-medium">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
+    </>
+  );
+
+  return (
+    <div className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+      {link ? (
+        <Link to={link}>
+          <Content />
+        </Link>
+      ) : (
+        <Content />
+      )}
     </div>
   );
 };
