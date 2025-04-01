@@ -12,6 +12,7 @@ import About from "./pages/About";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ChatAssistant from "./pages/ChatAssistant";
+import YoutubeScriptGeneratorPage from "./pages/YoutubeScriptGenerator";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -54,6 +55,7 @@ const AppRoutes = () => {
       <Route path="/generator" element={<ProtectedRoute><Generator /></ProtectedRoute>} />
       <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
       <Route path="/chat" element={<ProtectedRoute><ChatAssistant /></ProtectedRoute>} />
+      <Route path="/youtube-script" element={<ProtectedRoute><YoutubeScriptGeneratorPage /></ProtectedRoute>} />
       
       {/* Catch all route */}
       <Route path="*" element={<NotFound />} />

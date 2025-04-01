@@ -1,13 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search, Sliders } from 'lucide-react';
+import { Search, Sliders, Youtube } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const Templates = () => {
+  const { toast } = useToast();
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
   const templates = [
     {
       id: 1,
@@ -65,6 +70,14 @@ const Templates = () => {
       image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
       placeholders: ['title', 'intro', 'main-points', 'conclusion'],
     },
+    {
+      id: 9,
+      title: 'YouTube Script',
+      category: 'video',
+      image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0',
+      placeholders: ['hook', 'intro', 'main-content', 'call-to-action', 'outro'],
+      specialLink: '/youtube-script'
+    },
   ];
 
   const categories = [
@@ -73,7 +86,30 @@ const Templates = () => {
     { id: 'email', name: 'Email Templates' },
     { id: 'social', name: 'Social Media' },
     { id: 'content', name: 'Content' },
+    { id: 'video', name: 'Video Scripts' },
   ];
+
+  const handleCategoryClick = (categoryId: string) => {
+    setActiveCategory(categoryId);
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Filter templates based on active category and search term
+  const filteredTemplates = templates.filter((template) => {
+    const matchesCategory = activeCategory === 'all' || template.category === activeCategory;
+    const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const handleYoutubeScriptClick = () => {
+    toast({
+      title: "YouTube Script Generator",
+      description: "Creating a viral YouTube script for you...",
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -95,7 +131,9 @@ const Templates = () => {
                 <Input 
                   type="search" 
                   placeholder="Search templates..." 
-                  className="pl-8 w-full md:w-[200px] lg:w-[300px]" 
+                  className="pl-8 w-full md:w-[200px] lg:w-[300px]"
+                  value={searchTerm}
+                  onChange={handleSearch}
                 />
               </div>
               <Button variant="outline" size="icon">
@@ -110,8 +148,9 @@ const Templates = () => {
               {categories.map((category) => (
                 <Button 
                   key={category.id}
-                  variant={category.id === 'all' ? 'default' : 'outline'} 
+                  variant={category.id === activeCategory ? 'default' : 'outline'} 
                   className="mr-2 whitespace-nowrap"
+                  onClick={() => handleCategoryClick(category.id)}
                 >
                   {category.name}
                 </Button>
@@ -120,8 +159,12 @@ const Templates = () => {
 
             {/* Templates Grid */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {templates.map((template) => (
-                <Link key={template.id} to="/generator">
+              {filteredTemplates.map((template) => (
+                <Link 
+                  key={template.id} 
+                  to={template.specialLink || "/generator"}
+                  onClick={template.title === 'YouTube Script' ? handleYoutubeScriptClick : undefined}
+                >
                   <Card className="overflow-hidden h-full hover:shadow-md transition-shadow cursor-pointer group">
                     <div className="relative h-48">
                       <img 
@@ -132,8 +175,14 @@ const Templates = () => {
                       <div className="absolute top-2 right-2 bg-brand-purple text-white text-xs py-1 px-2 rounded-full">
                         {template.category === 'landing-page' ? 'Landing Page' :
                           template.category === 'email' ? 'Email' :
-                          template.category === 'social' ? 'Social Media' : 'Content'}
+                          template.category === 'social' ? 'Social Media' : 
+                          template.category === 'video' ? 'Video' : 'Content'}
                       </div>
+                      {template.title === 'YouTube Script' && (
+                        <div className="absolute bottom-2 right-2 bg-red-600 text-white p-1 rounded-full">
+                          <Youtube className="h-4 w-4" />
+                        </div>
+                      )}
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-medium mb-1">{template.title}</h3>
