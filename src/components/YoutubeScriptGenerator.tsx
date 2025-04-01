@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Wand2, AlertCircle, ClipboardCopy, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { chatWithAI } from '@/lib/ai';
+import { generateScript } from '@/lib/ai';
 
 const YoutubeScriptGenerator: React.FC = () => {
   const { toast } = useToast();
@@ -43,17 +42,10 @@ const YoutubeScriptGenerator: React.FC = () => {
     setError(null);
     
     try {
-      // Create a prompt for the YouTube script
-      const prompt = `Generate a viral YouTube script for a ${formData.duration} minute ${formData.style} video about "${formData.topic}". 
-      Target audience: ${formData.audience}. 
-      Tone: ${formData.tone}.
-      Include: an attention-grabbing hook, clear sections with timestamps, engaging questions for viewers, call to action, and memorable closing.
-      Format the script with sections for INTRO, MAIN CONTENT (with 3-5 key points), and OUTRO.`;
-      
       // Call the AI service to generate script
-      console.log("Calling AI with prompt:", prompt);
-      const response = await chatWithAI({ message: prompt });
-      console.log("Received response:", response);
+      console.log("Calling generateScript with:", formData);
+      const response = await generateScript(formData);
+      console.log("Received response length:", response.length);
       
       setGeneratedScript(response);
       toast({

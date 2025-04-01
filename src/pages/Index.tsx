@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, MessageSquare } from 'lucide-react'; 
+import { ArrowRight, Sparkles, MessageSquare, Youtube } from 'lucide-react'; 
 import { Link } from 'react-router-dom';
 import CopyGenerator from '@/components/CopyGenerator';
 
@@ -43,6 +43,46 @@ const Index = () => {
               <div className="lg:pl-10">
                 <div className="rounded-xl overflow-hidden shadow-xl border bg-card p-6">
                   <CopyGenerator />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* New YouTube Script Generator Section */}
+        <section className="py-12 bg-muted/30">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-6 lg:grid-cols-5 items-center">
+              <div className="lg:col-span-3 space-y-4">
+                <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-brand-purple/10 text-brand-purple mb-2">
+                  New Feature
+                </div>
+                <h2 className="text-3xl font-bold tracking-tight">Create Viral YouTube Scripts</h2>
+                <p className="text-muted-foreground">
+                  Generate professional, attention-grabbing scripts for your YouTube videos in seconds. 
+                  Our AI-powered script generator helps you create content that engages your audience and drives views.
+                </p>
+                <Link to="/youtube-script">
+                  <Button className="mt-2">
+                    <Youtube className="mr-2 h-4 w-4" /> Try YouTube Script Generator
+                  </Button>
+                </Link>
+              </div>
+              <div className="lg:col-span-2">
+                <div className="relative aspect-video rounded-lg overflow-hidden border shadow-lg">
+                  <img 
+                    src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0" 
+                    alt="YouTube Script Generator" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                    <div className="p-4 text-white">
+                      <div className="flex items-center">
+                        <Youtube className="h-6 w-6 mr-2 text-red-500" />
+                        <span className="font-medium">Script Generator</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

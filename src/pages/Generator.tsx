@@ -4,6 +4,9 @@ import Header from '@/components/Header';
 import CopyGenerator from '@/components/CopyGenerator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Youtube } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const Generator = () => {
   return (
@@ -14,6 +17,19 @@ const Generator = () => {
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">AI Copy Generator</h1>
+            
+            <div className="mb-6 bg-muted/30 rounded-lg p-4 border border-dashed flex items-center justify-between">
+              <div className="flex items-center">
+                <Youtube className="h-5 w-5 text-red-500 mr-3" />
+                <div>
+                  <h3 className="font-medium">New: YouTube Script Generator</h3>
+                  <p className="text-sm text-muted-foreground">Create professional scripts for viral videos</p>
+                </div>
+              </div>
+              <Link to="/youtube-script">
+                <Button variant="secondary">Try it now</Button>
+              </Link>
+            </div>
             
             <Tabs defaultValue="generator" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
