@@ -1,7 +1,7 @@
 // A simple auth implementation using localStorage
 // In a production app, this would connect to a real authentication service
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
