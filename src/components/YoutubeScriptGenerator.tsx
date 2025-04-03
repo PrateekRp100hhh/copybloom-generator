@@ -7,13 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Wand2, AlertCircle, ClipboardCopy, RefreshCw } from 'lucide-react';
+import { Wand2, AlertCircle, ClipboardCopy, RefreshCw, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateScript } from '@/lib/ai';
+import { generateScript, generateStoryElements } from '@/lib/ai';
 
 const YoutubeScriptGenerator: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [autoGenerating, setAutoGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     // Basic info
@@ -39,10 +40,74 @@ const YoutubeScriptGenerator: React.FC = () => {
     transition: '',
   });
   const [generatedScript, setGeneratedScript] = useState<string | null>(null);
+  const [expandedSections, setExpandedSections] = useState<string[]>(['hook', 'content', 'outro']);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError(null);
+  };
+
+  const autoGenerateStoryElements = async () => {
+    // Validate basic form requirements
+    if (!formData.topic || !formData.audience || !formData.tone) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in the topic, audience and tone to auto-generate elements.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAutoGenerating(true);
+    setError(null);
+    
+    try {
+      // Call the AI service to generate story elements
+      const elements = await generateStoryElements({
+        topic: formData.topic,
+        audience: formData.audience,
+        tone: formData.tone,
+        duration: formData.duration,
+        style: formData.style
+      });
+      
+      // Update the form with the generated elements
+      setFormData(prev => ({
+        ...prev,
+        // Hook elements
+        hookQuestion: elements.hook.hookQuestion || prev.hookQuestion,
+        painPoint: elements.hook.painPoint || prev.painPoint,
+        curiosityHook: elements.hook.curiosityHook || prev.curiosityHook,
+        
+        // Content elements
+        keyPoints: elements.content.keyPoints || prev.keyPoints,
+        backstory: elements.content.backstory || prev.backstory,
+        challenge: elements.content.challenge || prev.challenge,
+        twist: elements.content.twist || prev.twist,
+        
+        // Outro elements
+        callToAction: elements.outro.callToAction || prev.callToAction,
+        transition: elements.outro.transition || prev.transition,
+      }));
+
+      // Ensure all accordion sections are expanded
+      setExpandedSections(['hook', 'content', 'outro']);
+      
+      toast({
+        title: "Elements generated!",
+        description: "Story elements have been auto-generated based on your topic.",
+      });
+    } catch (error: any) {
+      console.error('Error auto-generating elements:', error);
+      setError(error.message || "Auto-generation failed");
+      toast({
+        title: "Auto-generation failed",
+        description: error.message || "There was an error generating story elements. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setAutoGenerating(false);
+    }
   };
 
   const generateScriptHandler = async () => {
@@ -102,6 +167,16 @@ const YoutubeScriptGenerator: React.FC = () => {
     });
     setGeneratedScript(null);
     setError(null);
+  };
+
+  const handleAccordionChange = (value: string) => {
+    setExpandedSections(prev => {
+      if (prev.includes(value)) {
+        return prev.filter(item => item !== value);
+      } else {
+        return [...prev, value];
+      }
+    });
   };
 
   return (
@@ -184,7 +259,36 @@ const YoutubeScriptGenerator: React.FC = () => {
           </div>
         </div>
 
-        <Accordion type="single" collapsible className="w-full border rounded-md">
+        <div className="flex items-center justify-between mt-4">
+          <h3 className="text-lg font-medium">Storytelling Elements</h3>
+          <Button
+            onClick={autoGenerateStoryElements}
+            variant="secondary"
+            size="sm"
+            disabled={autoGenerating || !formData.topic || !formData.audience || !formData.tone}
+          >
+            {autoGenerating ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                <Sparkles className="mr-2 h-4 w-4" /> Auto-Generate Elements
+              </span>
+            )}
+          </Button>
+        </div>
+
+        <Accordion 
+          type="multiple" 
+          value={expandedSections} 
+          onValueChange={setExpandedSections}
+          className="w-full border rounded-md"
+        >
           <AccordionItem value="hook">
             <AccordionTrigger className="px-4">Hook Elements (Engagement)</AccordionTrigger>
             <AccordionContent className="px-4 pt-2 pb-4 space-y-4">
@@ -311,7 +415,7 @@ const YoutubeScriptGenerator: React.FC = () => {
               </span>
             )}
           </Button>
-          <Button variant="outline" onClick={resetForm} disabled={loading}>
+          <Button variant="outline" onClick={resetForm} disabled={loading || autoGenerating}>
             <RefreshCw className="h-4 w-4 mr-2" /> Reset
           </Button>
         </div>
