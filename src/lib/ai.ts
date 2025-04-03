@@ -1,4 +1,3 @@
-
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 // Initialize the API with your key
@@ -23,6 +22,18 @@ interface ScriptGenerationParams {
   tone: string;
   duration: string;
   style: string;
+  
+  hookQuestion?: string;
+  painPoint?: string;
+  curiosityHook?: string;
+  
+  keyPoints?: string;
+  backstory?: string;
+  challenge?: string;
+  twist?: string;
+  
+  callToAction?: string;
+  transition?: string;
 }
 
 // Safety settings - make sure content is appropriate for marketing
@@ -200,15 +211,42 @@ export const chatWithAI = async (params: ChatMessageParams): Promise<string> => 
 };
 
 export const generateScript = async (params: ScriptGenerationParams): Promise<string> => {
-  const { topic, audience, tone, duration, style } = params;
+  const { 
+    topic, audience, tone, duration, style,
+    hookQuestion, painPoint, curiosityHook,
+    keyPoints, backstory, challenge, twist,
+    callToAction, transition
+  } = params;
   
   try {
-    // Create a prompt for the YouTube script
-    const prompt = `Generate a viral YouTube script for a ${duration} minute ${style} video about "${topic}". 
+    // Build a structured prompt incorporating storytelling elements
+    let prompt = `Generate a viral YouTube script for a ${duration} minute ${style} video about "${topic}". 
     Target audience: ${audience}. 
     Tone: ${tone}.
-    Include: an attention-grabbing hook, clear sections with timestamps, engaging questions for viewers, call to action, and memorable closing.
-    Format the script with sections for INTRO, MAIN CONTENT (with 3-5 key points), and OUTRO.
+    
+    Script structure should follow the Hook-Content-Outro framework:`;
+    
+    // Add Hook section based on provided inputs
+    prompt += `\n\n1. HOOK (Opening):`;
+    if (hookQuestion) prompt += `\n- Include this thought-provoking question: "${hookQuestion}"`;
+    if (painPoint) prompt += `\n- Address this audience pain point: "${painPoint}"`;
+    if (curiosityHook) prompt += `\n- Use this curiosity element: "${curiosityHook}"`;
+    
+    // Add Content section based on provided inputs
+    prompt += `\n\n2. CONTENT (Main body):`;
+    if (keyPoints) prompt += `\n- Cover these key points: ${keyPoints}`;
+    if (backstory) prompt += `\n- Include this backstory for context: "${backstory}"`;
+    if (challenge) prompt += `\n- Address this challenge or obstacle: "${challenge}"`;
+    if (twist) prompt += `\n- Incorporate this unexpected insight or twist: "${twist}"`;
+    
+    // Add Outro section based on provided inputs
+    prompt += `\n\n3. OUTRO (Closing):`;
+    if (callToAction) prompt += `\n- End with this call to action: "${callToAction}"`;
+    if (transition) prompt += `\n- Include this transition to other content: "${transition}"`;
+    
+    // Additional instructions
+    prompt += `\n\nFormat the script with clear sections for HOOK, MAIN CONTENT (with 3-5 key points), and OUTRO.
+    Include timestamps, engaging questions for viewers, and a memorable closing.
     Make it comprehensive and engaging within 1000 words maximum.`;
     
     console.log("Calling AI with prompt:", prompt);

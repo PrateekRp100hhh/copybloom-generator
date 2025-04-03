@@ -18,7 +18,7 @@ const YoutubeScriptGeneratorPage = () => {
               <CardHeader>
                 <CardTitle>Create Viral YouTube Scripts</CardTitle>
                 <CardDescription>
-                  Fill in the form below to generate a professional script for your next YouTube video.
+                  Fill in the form below to generate a professional script with the Hook-Story-Content-Outro framework for your next YouTube video.
                 </CardDescription>
               </CardHeader>
               <CardContent>

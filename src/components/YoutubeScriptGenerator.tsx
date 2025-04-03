@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -5,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Wand2, AlertCircle, ClipboardCopy, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateScript } from '@/lib/ai';
@@ -14,11 +16,27 @@ const YoutubeScriptGenerator: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
+    // Basic info
     topic: '',
     audience: '',
     tone: '',
     duration: '5-10',
     style: 'educational',
+    
+    // Hook elements
+    hookQuestion: '',
+    painPoint: '',
+    curiosityHook: '',
+    
+    // Content elements
+    keyPoints: '',
+    backstory: '',
+    challenge: '',
+    twist: '',
+    
+    // Outro elements
+    callToAction: '',
+    transition: '',
   });
   const [generatedScript, setGeneratedScript] = useState<string | null>(null);
 
@@ -72,6 +90,15 @@ const YoutubeScriptGenerator: React.FC = () => {
       tone: '',
       duration: '5-10',
       style: 'educational',
+      hookQuestion: '',
+      painPoint: '',
+      curiosityHook: '',
+      keyPoints: '',
+      backstory: '',
+      challenge: '',
+      twist: '',
+      callToAction: '',
+      transition: '',
     });
     setGeneratedScript(null);
     setError(null);
@@ -156,6 +183,113 @@ const YoutubeScriptGenerator: React.FC = () => {
             </Select>
           </div>
         </div>
+
+        <Accordion type="single" collapsible className="w-full border rounded-md">
+          <AccordionItem value="hook">
+            <AccordionTrigger className="px-4">Hook Elements (Engagement)</AccordionTrigger>
+            <AccordionContent className="px-4 pt-2 pb-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="hookQuestion">Surprising or thought-provoking question</Label>
+                <Input 
+                  id="hookQuestion" 
+                  placeholder="e.g., What if AI could write better than humans?" 
+                  value={formData.hookQuestion}
+                  onChange={(e) => handleChange('hookQuestion', e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="painPoint">Common problem or pain point</Label>
+                <Input 
+                  id="painPoint" 
+                  placeholder="e.g., Many people struggle to create engaging content consistently" 
+                  value={formData.painPoint}
+                  onChange={(e) => handleChange('painPoint', e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="curiosityHook">Curiosity element (shocking fact, bold statement)</Label>
+                <Input 
+                  id="curiosityHook" 
+                  placeholder="e.g., 90% of YouTube videos fail to retain viewers past the first minute" 
+                  value={formData.curiosityHook}
+                  onChange={(e) => handleChange('curiosityHook', e.target.value)}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="content">
+            <AccordionTrigger className="px-4">Content Elements (Storytelling)</AccordionTrigger>
+            <AccordionContent className="px-4 pt-2 pb-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="keyPoints">Key subtopics or steps to cover</Label>
+                <Textarea 
+                  id="keyPoints" 
+                  placeholder="e.g., 1. Introduction to AI tools, 2. Top tools comparison, 3. Implementation tips" 
+                  value={formData.keyPoints}
+                  onChange={(e) => handleChange('keyPoints', e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="backstory">Backstory or context for relatability</Label>
+                <Textarea 
+                  id="backstory" 
+                  placeholder="e.g., When I first started using AI tools, I was skeptical but then..." 
+                  value={formData.backstory}
+                  onChange={(e) => handleChange('backstory', e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="challenge">Challenge or obstacle to make topic engaging</Label>
+                <Input 
+                  id="challenge" 
+                  placeholder="e.g., The learning curve for these tools can be steep" 
+                  value={formData.challenge}
+                  onChange={(e) => handleChange('challenge', e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="twist">Unexpected insight or twist</Label>
+                <Input 
+                  id="twist" 
+                  placeholder="e.g., The most effective AI tool is actually the simplest one" 
+                  value={formData.twist}
+                  onChange={(e) => handleChange('twist', e.target.value)}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          
+          <AccordionItem value="outro">
+            <AccordionTrigger className="px-4">Outro Elements (Call to Action)</AccordionTrigger>
+            <AccordionContent className="px-4 pt-2 pb-4 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="callToAction">Call to action for viewers</Label>
+                <Input 
+                  id="callToAction" 
+                  placeholder="e.g., Subscribe for more AI tutorials and leave a comment with your favorite tool" 
+                  value={formData.callToAction}
+                  onChange={(e) => handleChange('callToAction', e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="transition">Transition to other content</Label>
+                <Input 
+                  id="transition" 
+                  placeholder="e.g., Check out my video on AI prompt engineering linked in the description" 
+                  value={formData.transition}
+                  onChange={(e) => handleChange('transition', e.target.value)}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <div className="flex gap-2">
           <Button 
