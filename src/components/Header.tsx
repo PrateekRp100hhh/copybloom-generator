@@ -15,12 +15,12 @@ const Header = () => {
   };
 
   return (
-    <header className="border-b py-4">
-      <div className="container flex items-center justify-between">
+    <header className="py-4 border-b border-gray-200 bg-white">
+      <div className="container px-4 md:px-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-brand-purple" />
-          <Link to="/" className="text-xl font-bold">
-            <span className="gradient-text">CopyBloom</span>
+          <Link to="/" className="flex items-center gap-1">
+            <Sparkles className="h-5 w-5 text-[#4338ca]" />
+            <span className="text-xl font-bold text-[#1a103d]">CopyBloom</span>
           </Link>
         </div>
         
@@ -39,23 +39,23 @@ const Header = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link to="/" className="text-sm font-medium hover:text-brand-purple transition-colors">
+          <Link to="/" className="text-sm font-medium text-gray-600 hover:text-[#4338ca] transition-colors">
             Home
           </Link>
           {isAuthenticated && (
             <>
-              <Link to="/templates" className="text-sm font-medium hover:text-brand-purple transition-colors">
+              <Link to="/templates" className="text-sm font-medium text-gray-600 hover:text-[#4338ca] transition-colors">
                 Templates
               </Link>
-              <Link to="/generator" className="text-sm font-medium hover:text-brand-purple transition-colors">
+              <Link to="/generator" className="text-sm font-medium text-gray-600 hover:text-[#4338ca] transition-colors">
                 Generator
               </Link>
-              <Link to="/chat" className="text-sm font-medium hover:text-brand-purple transition-colors">
+              <Link to="/chat" className="text-sm font-medium text-gray-600 hover:text-[#4338ca] transition-colors">
                 Chat
               </Link>
             </>
           )}
-          <Link to="/about" className="text-sm font-medium hover:text-brand-purple transition-colors">
+          <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-[#4338ca] transition-colors">
             About
           </Link>
         </nav>
@@ -67,12 +67,14 @@ const Header = () => {
                 variant="outline" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')}
+                className="border-gray-300 hover:bg-gray-50"
               >
                 Dashboard
               </Button>
               <Button 
                 size="sm"
                 onClick={logout}
+                className="bg-[#4338ca] hover:bg-[#3730a3]"
               >
                 Logout
               </Button>
@@ -83,14 +85,16 @@ const Header = () => {
                 variant="outline" 
                 size="sm" 
                 onClick={() => navigate('/auth')}
+                className="border-gray-300 hover:bg-gray-50"
               >
-                Sign In
+                Login
               </Button>
               <Button 
                 size="sm"
                 onClick={() => navigate('/auth')}
+                className="bg-[#4338ca] hover:bg-[#3730a3]"
               >
-                Get Started
+                Get Started — It's Free
               </Button>
             </>
           )}
@@ -98,7 +102,7 @@ const Header = () => {
         
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-background z-50 border-b md:hidden">
+          <div className="absolute top-16 left-0 right-0 z-50 bg-white border-b shadow-lg md:hidden">
             <div className="container py-4 flex flex-col space-y-3">
               <Link 
                 to="/" 
@@ -149,6 +153,7 @@ const Header = () => {
                         navigate('/dashboard');
                         setMenuOpen(false);
                       }}
+                      className="border-gray-300 hover:bg-gray-50"
                     >
                       Dashboard
                     </Button>
@@ -157,6 +162,7 @@ const Header = () => {
                         logout();
                         setMenuOpen(false);
                       }}
+                      className="bg-[#4338ca] hover:bg-[#3730a3]"
                     >
                       Logout
                     </Button>
@@ -169,16 +175,18 @@ const Header = () => {
                         navigate('/auth');
                         setMenuOpen(false);
                       }}
+                      className="border-gray-300 hover:bg-gray-50"
                     >
-                      Sign In
+                      Login
                     </Button>
                     <Button 
                       onClick={() => {
                         navigate('/auth');
                         setMenuOpen(false);
                       }}
+                      className="bg-[#4338ca] hover:bg-[#3730a3]"
                     >
-                      Get Started
+                      Get Started — It's Free
                     </Button>
                   </div>
                 )}
