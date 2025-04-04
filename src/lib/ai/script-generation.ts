@@ -30,7 +30,7 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
 
     // Apply storytelling framework to each key point
     if (keyPoints) {
-      prompt += `\n- Cover these key points, with each one following a storytelling framework:`;
+      prompt += `\n- Cover these key points, with each one following a storytelling framework. IMPORTANT: Create a cohesive narrative where each point naturally flows into the next one with smooth transitions. Make sure the points build on each other and connect thematically:`;
       
       // Check if keyPoints is an array or a string and handle accordingly
       const keyPointsArray = Array.isArray(keyPoints) 
@@ -47,9 +47,23 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
           prompt += `\n    - Details: Elaborate on key features and important information.`;
           prompt += `\n    - Challenge: Present a common problem or obstacle related to this point.`;
           prompt += `\n    - Plot Twist: Reveal an unexpected insight or innovative solution.`;
-          prompt += `\n    - Engagement: Include a mini-engagement element specific to this point.`;
+          
+          // Add transition to next point if not the last point
+          if (index < keyPointsArray.length - 1) {
+            const nextPointText = typeof keyPointsArray[index + 1] === 'string' ? keyPointsArray[index + 1].trim() : '';
+            if (nextPointText) {
+              prompt += `\n    - Transition: Create a natural bridge from this point to the next point: "${nextPointText}".`;
+            } else {
+              prompt += `\n    - Transition: Create a natural bridge to the next key point.`;
+            }
+          } else {
+            prompt += `\n    - Engagement: Include a mini-engagement element specific to this point.`;
+          }
         }
       });
+      
+      // Add instruction for narrative continuity
+      prompt += `\n\nEnsure that the script maintains a cohesive narrative thread throughout. Each point should build on the previous one and lead naturally to the next, creating a compelling and connected storyline rather than disjointed segments.`;
     }
 
     if (backstory) prompt += `\n- Include this overall backstory for context: "${backstory}"`;
@@ -62,8 +76,8 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
     if (transition) prompt += `\n- Include this transition to other content: "${transition}"`;
     
     // Additional instructions
-    prompt += `\n\nFormat the script with clear sections for HOOK, MAIN CONTENT (with each key point following the storytelling framework), and OUTRO.
-    Each key point should follow the structure: Backstory → Details → Challenge → Plot Twist → Engagement.
+    prompt += `\n\nFormat the script with clear sections for HOOK, MAIN CONTENT (with each key point flowing naturally into the next), and OUTRO.
+    Include engaging transitions between points to create a cohesive narrative arc rather than isolated segments.
     Include timestamps, engaging questions for viewers, and a memorable closing.
     Make it comprehensive and engaging within 1000 words maximum.`;
     
