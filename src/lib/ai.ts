@@ -242,9 +242,25 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
     
     // Add Content section based on provided inputs
     prompt += `\n\n2. CONTENT (Main body):`;
-    if (keyPoints) prompt += `\n- Cover these key points: ${keyPoints}`;
-    if (backstory) prompt += `\n- Include this backstory for context: "${backstory}"`;
-    if (challenge) prompt += `\n- Address this challenge or obstacle: "${challenge}"`;
+
+    // Apply storytelling framework to each key point
+    if (keyPoints) {
+      prompt += `\n- Cover these key points, with each one following a storytelling framework:`;
+      
+      // Extract the key points and apply storytelling structure to each
+      const points = keyPoints.split(/\d+\.\s+/).filter(Boolean);
+      points.forEach((point, index) => {
+        prompt += `\n  Point ${index + 1}: ${point.trim()}`;
+        prompt += `\n    - Backstory: Introduce the origins or background related to this point.`;
+        prompt += `\n    - Details: Elaborate on key features and important information.`;
+        prompt += `\n    - Challenge: Present a common problem or obstacle related to this point.`;
+        prompt += `\n    - Plot Twist: Reveal an unexpected insight or innovative solution.`;
+        prompt += `\n    - Engagement: Include a mini-engagement element specific to this point.`;
+      });
+    }
+
+    if (backstory) prompt += `\n- Include this overall backstory for context: "${backstory}"`;
+    if (challenge) prompt += `\n- Address this overall challenge or obstacle: "${challenge}"`;
     if (twist) prompt += `\n- Incorporate this unexpected insight or twist: "${twist}"`;
     
     // Add Outro section based on provided inputs
@@ -253,7 +269,8 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
     if (transition) prompt += `\n- Include this transition to other content: "${transition}"`;
     
     // Additional instructions
-    prompt += `\n\nFormat the script with clear sections for HOOK, MAIN CONTENT (with 3-5 key points), and OUTRO.
+    prompt += `\n\nFormat the script with clear sections for HOOK, MAIN CONTENT (with each key point following the storytelling framework), and OUTRO.
+    Each key point should follow the structure: Backstory → Details → Challenge → Plot Twist → Engagement.
     Include timestamps, engaging questions for viewers, and a memorable closing.
     Make it comprehensive and engaging within 1000 words maximum.`;
     
@@ -331,7 +348,7 @@ export const generateStoryElements = async (params: StoryElementsParams): Promis
           "curiosityHook": "A surprising fact or statement to create curiosity"
         },
         "content": {
-          "keyPoints": "3-5 key points to cover in bullet-point format",
+          "keyPoints": "3-5 key points as a numbered list, each point should be concise and focused on one aspect of the topic",
           "backstory": "A brief contextual backstory to make the topic relatable",
           "challenge": "A challenge or obstacle that makes this topic engaging",
           "twist": "An unexpected insight or twist that makes the content stand out"
@@ -343,6 +360,7 @@ export const generateStoryElements = async (params: StoryElementsParams): Promis
       }
       
       Ensure all elements are creative, engaging, and tailored to the specified audience and tone.
+      For the keyPoints, make sure to format them as a numbered list (1., 2., 3., etc.) with each point being distinct and focused.
       Return ONLY the JSON object, nothing else.
     `;
 

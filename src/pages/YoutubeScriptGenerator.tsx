@@ -18,7 +18,7 @@ const YoutubeScriptGeneratorPage = () => {
               <CardHeader>
                 <CardTitle>Create Viral YouTube Scripts</CardTitle>
                 <CardDescription>
-                  Fill in the basic details about your video, and our AI will auto-generate engaging hook, content, and outro elements using the Hook-Story-Content-Outro framework for your next viral YouTube video.
+                  Fill in the basic details about your video, and our AI will auto-generate an engaging script using the Hook-Content-Outro framework with advanced storytelling. Each key point will follow a 5-step storytelling structure for maximum viewer engagement.
                 </CardDescription>
               </CardHeader>
               <CardContent>

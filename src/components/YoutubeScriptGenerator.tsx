@@ -7,9 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Wand2, AlertCircle, ClipboardCopy, RefreshCw, Sparkles } from 'lucide-react';
+import { Wand2, AlertCircle, ClipboardCopy, RefreshCw, Sparkles, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateScript, generateStoryElements } from '@/lib/ai';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const YoutubeScriptGenerator: React.FC = () => {
   const { toast } = useToast();
@@ -260,7 +266,31 @@ const YoutubeScriptGenerator: React.FC = () => {
         </div>
 
         <div className="flex items-center justify-between mt-4">
-          <h3 className="text-lg font-medium">Storytelling Elements</h3>
+          <div className="flex items-center">
+            <h3 className="text-lg font-medium">Storytelling Elements</h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="ml-1">
+                    <Info className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-md p-4">
+                  <div className="space-y-2">
+                    <p className="font-semibold">Storytelling Framework:</p>
+                    <p>Each content point will follow this structure:</p>
+                    <ol className="list-decimal pl-5 space-y-1">
+                      <li><span className="font-medium">Backstory:</span> Introduces the origins or background</li>
+                      <li><span className="font-medium">Details:</span> Elaborates on key features and information</li>
+                      <li><span className="font-medium">Challenge:</span> Presents a common problem or obstacle</li>
+                      <li><span className="font-medium">Plot Twist:</span> Reveals an unexpected insight or solution</li>
+                      <li><span className="font-medium">Engagement:</span> Includes a mini-engagement element</li>
+                    </ol>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <Button
             onClick={autoGenerateStoryElements}
             variant="secondary"
@@ -328,17 +358,35 @@ const YoutubeScriptGenerator: React.FC = () => {
             <AccordionTrigger className="px-4">Content Elements (Storytelling)</AccordionTrigger>
             <AccordionContent className="px-4 pt-2 pb-4 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="keyPoints">Key subtopics or steps to cover</Label>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="keyPoints">Key points (Each will follow the storytelling framework)</Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-5 w-5 p-0">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        <p className="max-w-xs">Each point will automatically follow the 5-step storytelling framework. Format as a numbered list.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
                 <Textarea 
                   id="keyPoints" 
-                  placeholder="e.g., 1. Introduction to AI tools, 2. Top tools comparison, 3. Implementation tips" 
+                  placeholder="e.g., 1. Introduction to AI tools&#10;2. Top tools comparison&#10;3. Implementation tips" 
                   value={formData.keyPoints}
                   onChange={(e) => handleChange('keyPoints', e.target.value)}
+                  className="min-h-[100px]"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Format as a numbered list (1., 2., 3.). Each point will be structured with Backstory → Details → Challenge → Plot Twist → Engagement.
+                </p>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="backstory">Backstory or context for relatability</Label>
+                <Label htmlFor="backstory">Overall backstory or context (optional)</Label>
                 <Textarea 
                   id="backstory" 
                   placeholder="e.g., When I first started using AI tools, I was skeptical but then..." 
@@ -348,7 +396,7 @@ const YoutubeScriptGenerator: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="challenge">Challenge or obstacle to make topic engaging</Label>
+                <Label htmlFor="challenge">Overall challenge or obstacle (optional)</Label>
                 <Input 
                   id="challenge" 
                   placeholder="e.g., The learning curve for these tools can be steep" 
@@ -358,7 +406,7 @@ const YoutubeScriptGenerator: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="twist">Unexpected insight or twist</Label>
+                <Label htmlFor="twist">Overall unexpected insight or twist (optional)</Label>
                 <Input 
                   id="twist" 
                   placeholder="e.g., The most effective AI tool is actually the simplest one" 
@@ -394,6 +442,23 @@ const YoutubeScriptGenerator: React.FC = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        <div className="mt-4 p-3 border rounded-md bg-accent/30">
+          <h4 className="font-medium flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            Storytelling Framework
+          </h4>
+          <p className="text-sm text-muted-foreground mt-1">
+            Each key point in your script will automatically follow our 5-step storytelling framework:
+          </p>
+          <ol className="mt-2 space-y-1 text-sm ml-5 list-decimal">
+            <li><span className="font-medium">Backstory:</span> Origins related to the point</li>
+            <li><span className="font-medium">Details:</span> Key features and information</li>
+            <li><span className="font-medium">Challenge:</span> Problem or obstacle</li>
+            <li><span className="font-medium">Plot Twist:</span> Unexpected insight or solution</li>
+            <li><span className="font-medium">Engagement:</span> Call-to-action for each point</li>
+          </ol>
+        </div>
 
         <div className="flex gap-2">
           <Button 
