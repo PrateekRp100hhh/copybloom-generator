@@ -9,7 +9,7 @@ interface OutroSectionProps {
   formData: ScriptFormData;
   handleChange: (field: string, value: string) => void;
   expandedSections: string[];
-  handleAccordionChange: (value: string) => void;
+  handleAccordionChange: (value: string[]) => void;
 }
 
 const OutroSection: React.FC<OutroSectionProps> = ({ 

@@ -97,14 +97,8 @@ const YoutubeScriptForm: React.FC<{
     }
   };
 
-  const handleAccordionChange = (value: string) => {
-    setExpandedSections(prev => {
-      if (prev.includes(value)) {
-        return prev.filter(item => item !== value);
-      } else {
-        return [...prev, value];
-      }
-    });
+  const handleAccordionChange = (value: string[]) => {
+    setExpandedSections(value);
   };
 
   return (
