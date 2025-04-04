@@ -7,4 +7,4 @@ export { generateStoryElements } from './story-elements';
 export { generateScript } from './script-generation';
 
 // Also export any shared types or configuration if needed
-export { API_KEY, genAI, safetySettings } from './config';
+export { API_KEY, genAI, safetySettings, chatHistory, updateChatHistory } from './config';

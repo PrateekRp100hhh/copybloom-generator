@@ -1,4 +1,5 @@
-import { genAI, safetySettings, chatHistory } from './config';
+
+import { genAI, safetySettings, chatHistory, updateChatHistory } from './config';
 import { evaluateContentQuality, improveContentQuality } from './content-quality';
 import { ChatMessageParams } from './types';
 
@@ -41,13 +42,20 @@ export const chatWithAI = async (params: ChatMessageParams): Promise<string> => 
       attemptCount++;
     }
     
+    // Create a new chat history array
+    const newChatHistory = [...chatHistory];
+    
     // Update chat history for context
-    chatHistory.push({ role: "user", parts: [{ text: message }] });
-    chatHistory.push({ role: "model", parts: [{ text: generatedText }] });
+    newChatHistory.push({ role: "user", parts: [{ text: message }] });
+    newChatHistory.push({ role: "model", parts: [{ text: generatedText }] });
     
     // Limit history to last 10 messages to avoid token limits
-    if (chatHistory.length > 20) {
-      chatHistory = chatHistory.slice(chatHistory.length - 20);
+    if (newChatHistory.length > 20) {
+      // Use the update function to update the chat history
+      updateChatHistory(newChatHistory.slice(newChatHistory.length - 20));
+    } else {
+      // Use the update function to update the chat history
+      updateChatHistory(newChatHistory);
     }
     
     return generatedText;

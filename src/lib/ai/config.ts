@@ -27,3 +27,8 @@ export const safetySettings = [
 
 // Create a chat session
 export let chatHistory: any[] = [];
+
+// Function to update chat history
+export const updateChatHistory = (newHistory: any[]) => {
+  chatHistory = newHistory;
+};
