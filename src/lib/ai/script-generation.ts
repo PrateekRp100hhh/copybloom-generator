@@ -1,3 +1,4 @@
+
 import { genAI } from './config';
 import { evaluateContentQuality, improveContentQuality } from './content-quality';
 import { ScriptGenerationParams } from './types';
@@ -31,15 +32,23 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
     if (keyPoints) {
       prompt += `\n- Cover these key points, with each one following a storytelling framework:`;
       
-      // Extract the key points and apply storytelling structure to each
-      const points = keyPoints.split(/\d+\.\s+/).filter(Boolean);
-      points.forEach((point, index) => {
-        prompt += `\n  Point ${index + 1}: ${point.trim()}`;
-        prompt += `\n    - Backstory: Introduce the origins or background related to this point.`;
-        prompt += `\n    - Details: Elaborate on key features and important information.`;
-        prompt += `\n    - Challenge: Present a common problem or obstacle related to this point.`;
-        prompt += `\n    - Plot Twist: Reveal an unexpected insight or innovative solution.`;
-        prompt += `\n    - Engagement: Include a mini-engagement element specific to this point.`;
+      // Check if keyPoints is an array or a string and handle accordingly
+      const keyPointsArray = Array.isArray(keyPoints) 
+        ? keyPoints 
+        : typeof keyPoints === 'string' 
+          ? keyPoints.split(/\d+\.\s+/).filter(Boolean)
+          : [];
+      
+      keyPointsArray.forEach((point, index) => {
+        const pointText = typeof point === 'string' ? point.trim() : '';
+        if (pointText) {
+          prompt += `\n  Point ${index + 1}: ${pointText}`;
+          prompt += `\n    - Backstory: Introduce the origins or background related to this point.`;
+          prompt += `\n    - Details: Elaborate on key features and important information.`;
+          prompt += `\n    - Challenge: Present a common problem or obstacle related to this point.`;
+          prompt += `\n    - Plot Twist: Reveal an unexpected insight or innovative solution.`;
+          prompt += `\n    - Engagement: Include a mini-engagement element specific to this point.`;
+        }
       });
     }
 
