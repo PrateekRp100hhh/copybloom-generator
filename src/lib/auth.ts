@@ -1,7 +1,8 @@
-// A simple auth implementation using localStorage
-// In a production app, this would connect to a real authentication service
+// Authentication library using Supabase
+import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
 
-export interface User {
+export interface AppUser {
   id: string;
   name: string;
   email: string;
@@ -17,107 +18,113 @@ export interface Campaign {
   userId: string;
 }
 
-export const login = (email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    // Simulate API call delay
-    setTimeout(() => {
-      // For demo purposes, accept any email/password
-      // In production, this would validate against a real backend
-      if (email && password) {
-        // First check if user exists
-        const existingUsers = getUsersFromStorage();
-        const existingUser = existingUsers.find(u => u.email === email);
-        
-        if (existingUser) {
-          // In a real app, we would verify the password here
-          const user: User = {
-            ...existingUser,
-            isLoggedIn: true
-          };
-          
-          // Store in localStorage
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          resolve(user);
-        } else {
-          // For demo, we'll create a user if they don't exist
-          const user: User = {
-            id: generateUserId(),
-            name: email.split('@')[0],
-            email: email,
-            isLoggedIn: true,
-            createdAt: new Date().toISOString()
-          };
-          
-          // Save to users collection and set as current user
-          const users = getUsersFromStorage();
-          users.push(user);
-          localStorage.setItem('users', JSON.stringify(users));
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          
-          resolve(user);
-        }
-      } else {
-        reject(new Error('Email and password are required'));
-      }
-    }, 800);
-  });
-};
+export const login = async (email: string, password: string): Promise<AppUser> => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    if (!data.user) {
+      throw new Error('Login failed');
+    }
 
-export const signup = (name: string, email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    // Simulate API call delay
-    setTimeout(() => {
-      // In production, this would create a new user in a database
-      if (name && email && password) {
-        // Check if user already exists
-        const existingUsers = getUsersFromStorage();
-        if (existingUsers.some(u => u.email === email)) {
-          reject(new Error('User with this email already exists'));
-          return;
-        }
-        
-        const user: User = {
-          id: generateUserId(),
-          name: name,
-          email: email,
-          isLoggedIn: true,
-          createdAt: new Date().toISOString()
-        };
-        
-        // Save to users collection and set as current user
-        existingUsers.push(user);
-        localStorage.setItem('users', JSON.stringify(existingUsers));
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        resolve(user);
-      } else {
-        reject(new Error('All fields are required'));
-      }
-    }, 800);
-  });
-};
-
-export const logout = (): void => {
-  // Remove current user but keep in users list
-  localStorage.removeItem('currentUser');
-};
-
-export const getCurrentUser = (): User | null => {
-  const userData = localStorage.getItem('currentUser');
-  if (userData) {
-    return JSON.parse(userData);
+    // Create an AppUser object from Supabase user
+    const appUser: AppUser = {
+      id: data.user.id,
+      name: data.user.user_metadata?.name || email.split('@')[0],
+      email: data.user.email || '',
+      isLoggedIn: true,
+      createdAt: data.user.created_at
+    };
+    
+    return appUser;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
-  return null;
 };
 
-export const isAuthenticated = (): boolean => {
-  return localStorage.getItem('currentUser') !== null;
+export const signup = async (name: string, email: string, password: string): Promise<AppUser> => {
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    if (!data.user) {
+      throw new Error('Signup failed');
+    }
+
+    // Create an AppUser object from Supabase user
+    const appUser: AppUser = {
+      id: data.user.id,
+      name: name,
+      email: data.user.email || '',
+      isLoggedIn: true,
+      createdAt: data.user.created_at
+    };
+    
+    return appUser;
+  } catch (error) {
+    console.error('Signup error:', error);
+    throw error;
+  }
 };
+
+export const logout = async (): Promise<void> => {
+  try {
+    await supabase.auth.signOut();
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+};
+
+export const getCurrentUser = async (): Promise<AppUser | null> => {
+  try {
+    const { data } = await supabase.auth.getSession();
+    
+    if (!data.session?.user) {
+      return null;
+    }
+    
+    const user = data.session.user;
+    
+    return {
+      id: user.id,
+      name: user.user_metadata?.name || user.email?.split('@')[0] || '',
+      email: user.email || '',
+      isLoggedIn: true,
+      createdAt: user.created_at
+    };
+  } catch (error) {
+    console.error('Get current user error:', error);
+    return null;
+  }
+};
+
+export const isAuthenticated = async (): Promise<boolean> => {
+  const { data } = await supabase.auth.getSession();
+  return !!data.session;
+};
+
+// Campaign functions - these will need to be updated to use Supabase in a future update
+// For now, we'll keep using localStorage to minimize changes
 
 // Save campaign to localStorage
 export const saveCampaign = (campaign: Omit<Campaign, 'id' | 'userId' | 'date'>): Campaign => {
-  const user = getCurrentUser();
-  if (!user) {
+  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (!user?.id) {
     throw new Error('User must be logged in to save campaigns');
   }
   
@@ -137,8 +144,8 @@ export const saveCampaign = (campaign: Omit<Campaign, 'id' | 'userId' | 'date'>)
 
 // Get all campaigns for current user
 export const getUserCampaigns = (): Campaign[] => {
-  const user = getCurrentUser();
-  if (!user) return [];
+  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (!user?.id) return [];
   
   const allCampaigns = getCampaignsFromStorage();
   return allCampaigns.filter(c => c.userId === user.id);
@@ -146,8 +153,8 @@ export const getUserCampaigns = (): Campaign[] => {
 
 // Delete a campaign by ID
 export const deleteCampaign = (id: string): boolean => {
-  const user = getCurrentUser();
-  if (!user) return false;
+  const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (!user?.id) return false;
   
   const campaigns = getCampaignsFromStorage();
   const updatedCampaigns = campaigns.filter(c => c.id !== id);
@@ -161,11 +168,6 @@ export const deleteCampaign = (id: string): boolean => {
 };
 
 // Helper functions
-const getUsersFromStorage = (): User[] => {
-  const users = localStorage.getItem('users');
-  return users ? JSON.parse(users) : [];
-};
-
 const getCampaignsFromStorage = (): Campaign[] => {
   const campaigns = localStorage.getItem('campaigns');
   return campaigns ? JSON.parse(campaigns) : [];
