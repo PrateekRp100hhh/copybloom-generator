@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
         if (session?.user) {
@@ -39,13 +39,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           // Update state
           setUser(appUser);
-          
-          // Save to localStorage for backward compatibility
-          localStorage.setItem('currentUser', JSON.stringify(appUser));
-          
+          setIsLoading(false);
         } else {
           setUser(null);
-          localStorage.removeItem('currentUser');
+          setIsLoading(false);
         }
       }
     );
@@ -53,12 +50,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // THEN check for existing session
     const initializeAuth = async () => {
       try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
+        const { data } = await supabase.auth.getSession();
         
-        // For backward compatibility, update localStorage
-        if (currentUser) {
-          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        if (data.session?.user) {
+          const currentUser = await getCurrentUser();
+          setUser(currentUser);
         }
       } catch (error) {
         console.error('Error checking auth:', error);
