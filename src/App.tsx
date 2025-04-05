@@ -13,6 +13,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ChatAssistant from "./pages/ChatAssistant";
 import YoutubeScriptGeneratorPage from "./pages/YoutubeScriptGenerator";
+import GeminiGenerator from "./pages/GeminiGenerator";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -56,6 +57,7 @@ const AppRoutes = () => {
       <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
       <Route path="/chat" element={<ProtectedRoute><ChatAssistant /></ProtectedRoute>} />
       <Route path="/youtube-script" element={<ProtectedRoute><YoutubeScriptGeneratorPage /></ProtectedRoute>} />
+      <Route path="/gemini" element={<ProtectedRoute><GeminiGenerator /></ProtectedRoute>} />
       
       {/* Catch all route */}
       <Route path="*" element={<NotFound />} />
