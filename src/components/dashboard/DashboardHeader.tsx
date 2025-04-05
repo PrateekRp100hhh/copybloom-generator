@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { User } from '@/lib/auth';
+import { AppUser } from '@/lib/auth';
 
 interface DashboardHeaderProps {
-  user: User | null;
+  user: AppUser | null;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user }) => {
