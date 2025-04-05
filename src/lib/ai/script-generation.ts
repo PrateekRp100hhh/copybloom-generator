@@ -1,5 +1,5 @@
 
-import { genAI } from './config';
+import { generateGeminiContent } from './gemini-content';
 import { evaluateContentQuality, improveContentQuality } from './content-quality';
 import { ScriptGenerationParams } from './types';
 
@@ -81,18 +81,11 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
     Include timestamps, engaging questions for viewers, and a memorable closing.
     Make it comprehensive and engaging within 1000 words maximum.`;
     
-    console.log("Calling AI with prompt:", prompt);
+    console.log("Calling Gemini Content generator with prompt for YouTube script");
     
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        maxOutputTokens: 1000,
-      } 
-    });
-    
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let generatedText = response.text();
+    // Instead of directly using genAI, we now use the generateGeminiContent function
+    // which calls our Edge Function that uses the training data for better response styling
+    const generatedText = await generateGeminiContent(prompt);
     
     // Evaluate content quality
     let contentScore = await evaluateContentQuality(generatedText);
@@ -101,17 +94,18 @@ export const generateScript = async (params: ScriptGenerationParams): Promise<st
     // If score is below threshold, improve content
     let attemptCount = 0;
     const maxAttempts = 2;
+    let improvedText = generatedText;
     
     while (contentScore < 8 && attemptCount < maxAttempts) {
       console.log(`Script score ${contentScore} below threshold. Improving content...`);
-      generatedText = await improveContentQuality(generatedText, contentScore);
-      contentScore = await evaluateContentQuality(generatedText);
+      improvedText = await improveContentQuality(improvedText, contentScore);
+      contentScore = await evaluateContentQuality(improvedText);
       console.log(`Improved script quality score: ${contentScore}/10`);
       attemptCount++;
     }
     
     console.log("Received final response with quality score:", contentScore);
-    return generatedText;
+    return improvedText;
   } catch (error) {
     console.error('Error generating script:', error);
     throw new Error('Failed to generate script. Please try again later.');

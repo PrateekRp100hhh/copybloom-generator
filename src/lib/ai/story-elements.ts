@@ -1,4 +1,5 @@
-import { genAI } from './config';
+
+import { generateGeminiContent } from './gemini-content';
 import { StoryElementsParams, StoryElements } from './types';
 
 export const generateStoryElements = async (params: StoryElementsParams): Promise<StoryElements> => {
@@ -38,16 +39,8 @@ export const generateStoryElements = async (params: StoryElementsParams): Promis
       Return ONLY the JSON object, nothing else.
     `;
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        maxOutputTokens: 1000,
-      } 
-    });
-    
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const generatedText = response.text();
+    // Use the centralized generateGeminiContent function
+    const generatedText = await generateGeminiContent(prompt);
     
     // Parse the response as JSON
     try {
