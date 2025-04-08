@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
         if (session?.user) {
@@ -95,6 +95,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleSignup = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
+      // Check if email already exists
+      const { data } = await supabase.auth.signInWithPassword({
+        email,
+        password: 'dummy-password-for-check'
+      });
+      
+      // If we get a user back with this email, it means the email exists
+      // The dummy password will likely be wrong, but that's ok for this check
+      if (data.user) {
+        toast({
+          title: "Account already exists",
+          description: "An account with this email already exists. Please log in instead.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // If we get here, the email doesn't exist, so create the account
       const user = await signup(name, email, password);
       setUser(user);
       toast({
@@ -102,12 +121,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Your account has been created successfully",
       });
       navigate('/dashboard');
-    } catch (error) {
-      toast({
-        title: "Error creating account",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive"
-      });
+    } catch (error: any) {
+      // Handle errors with more details
+      // If the error is about an existing account, provide a clear message
+      if (error.message?.includes('already') || error.message?.includes('duplicate') || error.message?.includes('exists')) {
+        toast({
+          title: "Account already exists",
+          description: "An account with this email already exists. Please log in instead.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error creating account",
+          description: error.message || "Unknown error occurred",
+          variant: "destructive"
+        });
+      }
       throw error;
     } finally {
       setIsLoading(false);
