@@ -5,8 +5,9 @@ import { generateGeminiContent } from './gemini-content';
 export const evaluateContentQuality = async (content: string): Promise<number> => {
   try {
     const evaluationPrompt = `
-    Evaluate the quality of the following marketing content on a scale of 1-10.
-    Consider these factors: clarity, persuasiveness, engagement, relevance, and call-to-action effectiveness.
+    Evaluate the quality of the following YouTube script content on a scale of 1-10.
+    Consider these factors: clarity, storytelling flow, engagement, relevance, and call-to-action effectiveness.
+    
     Content to evaluate:
     "${content}"
     
@@ -29,9 +30,13 @@ export const evaluateContentQuality = async (content: string): Promise<number> =
 export const improveContentQuality = async (content: string, currentScore: number): Promise<string> => {
   try {
     const improvementPrompt = `
-    The following marketing content scored ${currentScore}/10 in quality.
-    Please improve it to achieve a score of 8 or higher while maintaining the same message and intent:
-    "${content}"
+    The following YouTube script content scored ${currentScore}/10 in quality.
+    Please improve it to achieve a score of 8 or higher while maintaining the same message, structure and key points:
+    
+    ORIGINAL CONTENT:
+    """
+    ${content}
+    """
     
     Return ONLY the improved content, nothing else.`;
     
@@ -39,5 +44,29 @@ export const improveContentQuality = async (content: string, currentScore: numbe
   } catch (error) {
     console.error('Error improving content quality:', error);
     return content; // Return original content if improvement fails
+  }
+};
+
+// Function to refine content based on specific user requests
+export const refineContent = async (content: string, refinementRequest: string): Promise<string> => {
+  try {
+    const refinementPrompt = `
+    You are a specialized YouTube script refiner. I have a YouTube script that I'd like you to refine based on the following user request:
+    
+    USER REQUEST: "${refinementRequest}"
+    
+    ORIGINAL SCRIPT:
+    """
+    ${content}
+    """
+    
+    Please refine this script according to the user's request. Keep the structure and key points of the original script, but adapt it to match the requested style or changes.
+    
+    Respond with ONLY the refined script, no introduction or notes.`;
+    
+    return await generateGeminiContent(refinementPrompt);
+  } catch (error) {
+    console.error('Error refining content:', error);
+    return content; // Return original content if refinement fails
   }
 };

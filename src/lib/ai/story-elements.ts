@@ -65,3 +65,46 @@ export const generateStoryElements = async (params: StoryElementsParams): Promis
     throw new Error('Failed to generate story elements. Please try again.');
   }
 };
+
+// Function to refine story elements based on user feedback
+export const refineStoryElements = async (
+  elements: StoryElements, 
+  refinementRequest: string
+): Promise<StoryElements> => {
+  try {
+    const elementsJson = JSON.stringify(elements, null, 2);
+    
+    const prompt = `
+      I have the following storytelling elements for a YouTube video:
+      
+      ${elementsJson}
+      
+      Please refine these elements based on this user request: "${refinementRequest}"
+      
+      Return ONLY a valid JSON object with the same structure, refined according to the user's request.
+    `;
+    
+    const generatedText = await generateGeminiContent(prompt);
+    
+    try {
+      const refinedElements = JSON.parse(generatedText);
+      return refinedElements;
+    } catch (parseError) {
+      console.error('Error parsing JSON from refinement:', parseError);
+      // Attempt to extract JSON
+      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch (e) {
+          throw new Error('Failed to parse refined story elements');
+        }
+      } else {
+        throw new Error('Failed to parse refined story elements');
+      }
+    }
+  } catch (error) {
+    console.error('Error refining story elements:', error);
+    return elements; // Return original elements if refinement fails
+  }
+};
