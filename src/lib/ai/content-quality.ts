@@ -17,12 +17,23 @@ export const evaluateContentQuality = async (content: string): Promise<number> =
     
     // Extract number from response
     const scoreMatch = response.match(/\d+/);
-    const score = scoreMatch ? parseInt(scoreMatch[0], 10) : 5;
+    if (!scoreMatch) {
+      console.warn('Could not extract score from response:', response);
+      return 7; // Default to 7 if no number found
+    }
     
-    return Math.min(Math.max(score, 1), 10); // Ensure score is between 1 and 10
+    const score = parseInt(scoreMatch[0], 10);
+    
+    // Check if score is a valid number and within range
+    if (isNaN(score) || score < 1 || score > 10) {
+      console.warn('Invalid score extracted:', score, 'from response:', response);
+      return 7; // Default to 7 for invalid scores
+    }
+    
+    return score;
   } catch (error) {
     console.error('Error evaluating content quality:', error);
-    return 8; // Default to 8 if evaluation fails
+    return 7; // Default to 7 if evaluation fails
   }
 };
 
@@ -40,7 +51,15 @@ export const improveContentQuality = async (content: string, currentScore: numbe
     
     Return ONLY the improved content, nothing else.`;
     
-    return await generateGeminiContent(improvementPrompt);
+    const improvedContent = await generateGeminiContent(improvementPrompt);
+    
+    // Verify we got a non-empty response
+    if (!improvedContent || improvedContent.trim().length < 50) {
+      console.error('Improvement produced insufficient content:', improvedContent);
+      return content; // Return original content if improvement is too short
+    }
+    
+    return improvedContent;
   } catch (error) {
     console.error('Error improving content quality:', error);
     return content; // Return original content if improvement fails
@@ -64,7 +83,15 @@ export const refineContent = async (content: string, refinementRequest: string):
     
     Respond with ONLY the refined script, no introduction or notes.`;
     
-    return await generateGeminiContent(refinementPrompt);
+    const refinedContent = await generateGeminiContent(refinementPrompt);
+    
+    // Verify we got a non-empty response
+    if (!refinedContent || refinedContent.trim().length < 50) {
+      console.error('Refinement produced insufficient content:', refinedContent);
+      return content; // Return original content if refinement is too short
+    }
+    
+    return refinedContent;
   } catch (error) {
     console.error('Error refining content:', error);
     return content; // Return original content if refinement fails

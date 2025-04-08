@@ -44,21 +44,29 @@ export const generateStoryElements = async (params: StoryElementsParams): Promis
     
     // Parse the response as JSON
     try {
-      const elements = JSON.parse(generatedText);
+      // Try to parse the response directly first
+      let elements: StoryElements;
+      try {
+        elements = JSON.parse(generatedText);
+      } catch (parseError) {
+        // If direct parsing fails, try to extract JSON from the text
+        console.error('Initial JSON parsing failed, attempting to extract JSON:', parseError);
+        const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('Failed to extract JSON from response');
+        }
+        elements = JSON.parse(jsonMatch[0]);
+      }
+      
+      // Validate the extracted JSON structure
+      if (!elements.hook || !elements.content || !elements.outro) {
+        throw new Error('Generated elements missing required sections');
+      }
+      
       return elements;
     } catch (parseError) {
-      console.error('Error parsing JSON response:', parseError);
-      // Try to extract JSON from text if not properly formatted
-      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[0]);
-        } catch (e) {
-          throw new Error('Failed to parse story elements from AI response');
-        }
-      } else {
-        throw new Error('Failed to parse story elements from AI response');
-      }
+      console.error('Error parsing JSON response:', parseError, 'Raw response:', generatedText);
+      throw new Error('Failed to generate valid story elements. Please try again.');
     }
   } catch (error) {
     console.error('Error generating story elements:', error);
@@ -87,24 +95,31 @@ export const refineStoryElements = async (
     const generatedText = await generateGeminiContent(prompt);
     
     try {
-      const refinedElements = JSON.parse(generatedText);
+      let refinedElements: StoryElements;
+      try {
+        refinedElements = JSON.parse(generatedText);
+      } catch (parseError) {
+        // Try to extract JSON from text if direct parsing fails
+        console.error('Initial JSON parsing failed for refinement, attempting to extract JSON');
+        const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('Failed to extract JSON from refinement response');
+        }
+        refinedElements = JSON.parse(jsonMatch[0]);
+      }
+      
+      // Validate structure
+      if (!refinedElements.hook || !refinedElements.content || !refinedElements.outro) {
+        throw new Error('Refined elements missing required sections');
+      }
+      
       return refinedElements;
     } catch (parseError) {
-      console.error('Error parsing JSON from refinement:', parseError);
-      // Attempt to extract JSON
-      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[0]);
-        } catch (e) {
-          throw new Error('Failed to parse refined story elements');
-        }
-      } else {
-        throw new Error('Failed to parse refined story elements');
-      }
+      console.error('Error parsing JSON from refinement:', parseError, 'Raw response:', generatedText);
+      throw new Error('Failed to parse refined story elements');
     }
   } catch (error) {
     console.error('Error refining story elements:', error);
-    return elements; // Return original elements if refinement fails
+    throw new Error('Failed to refine story elements. Please try again.');
   }
 };

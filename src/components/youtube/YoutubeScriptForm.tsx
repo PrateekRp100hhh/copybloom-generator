@@ -35,6 +35,7 @@ const YoutubeScriptForm: React.FC<{
 }) => {
   const { toast } = useToast();
   const [expandedSections, setExpandedSections] = useState<string[]>(['hook', 'content', 'outro']);
+  const [regeneratingElements, setRegeneratingElements] = useState(false);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -53,6 +54,7 @@ const YoutubeScriptForm: React.FC<{
 
     try {
       // Call the AI service to generate story elements
+      setRegeneratingElements(true);
       const elements = await generateStoryElements({
         topic: formData.topic,
         audience: formData.audience,
@@ -94,6 +96,8 @@ const YoutubeScriptForm: React.FC<{
         description: error.message || "There was an error generating story elements. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setRegeneratingElements(false);
     }
   };
 
@@ -134,26 +138,33 @@ const YoutubeScriptForm: React.FC<{
             </Tooltip>
           </TooltipProvider>
         </div>
-        <Button
-          onClick={autoGenerateStoryElements}
-          variant="secondary"
-          size="sm"
-          disabled={autoGenerating || !formData.topic || !formData.audience || !formData.tone}
-        >
-          {autoGenerating ? (
-            <span className="flex items-center">
-              <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Generating...
-            </span>
-          ) : (
-            <span className="flex items-center">
-              <Sparkles className="mr-2 h-4 w-4" /> Auto-Generate Elements
-            </span>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={autoGenerateStoryElements}
+            variant={formData.hookQuestion || formData.keyPoints ? "outline" : "secondary"}
+            size="sm"
+            disabled={regeneratingElements || !formData.topic || !formData.audience || !formData.tone}
+          >
+            {regeneratingElements ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                {formData.hookQuestion || formData.keyPoints ? (
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" />
+                )}
+                {formData.hookQuestion || formData.keyPoints ? 'Regenerate Elements' : 'Auto-Generate Elements'}
+              </span>
+            )}
+          </Button>
+        </div>
       </div>
 
       <HookSection 
@@ -214,7 +225,7 @@ const YoutubeScriptForm: React.FC<{
             </span>
           )}
         </Button>
-        <Button variant="outline" onClick={resetForm} disabled={loading || autoGenerating}>
+        <Button variant="outline" onClick={resetForm} disabled={loading || regeneratingElements}>
           <RefreshCw className="h-4 w-4 mr-2" /> Reset
         </Button>
       </div>

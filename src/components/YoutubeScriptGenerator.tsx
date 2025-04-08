@@ -104,6 +104,9 @@ const YoutubeScriptGenerator: React.FC = () => {
       <ScriptResult 
         generatedScript={generatedScript}
         setGeneratedScript={setGeneratedScript}
+        formData={formData}
+        loading={loading}
+        setLoading={setLoading}
       />
     </div>
   );
