@@ -95,14 +95,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleSignup = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Check if email already exists
+      // First, try to check if the account already exists
+      // This uses the same approach as in auth.ts
       const { data } = await supabase.auth.signInWithPassword({
         email,
         password: 'dummy-password-for-check'
       });
       
-      // If we get a user back with this email, it means the email exists
-      // The dummy password will likely be wrong, but that's ok for this check
+      // If we get a successful sign-in, it means the email exists
       if (data.user) {
         toast({
           title: "Account already exists",
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
       
-      // If we get here, the email doesn't exist, so create the account
+      // If we get here, proceed with signup
       const user = await signup(name, email, password);
       setUser(user);
       toast({

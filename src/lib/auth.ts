@@ -1,4 +1,3 @@
-
 // Authentication library using Supabase
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -49,19 +48,18 @@ export const login = async (email: string, password: string): Promise<AppUser> =
 
 export const signup = async (name: string, email: string, password: string): Promise<AppUser> => {
   try {
-    // First check if the email exists to provide better error messages
-    const { count, error: countError } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('email', email);
-      
-    if (countError) {
-      console.warn('Error checking for existing email:', countError);
-      // Continue with signup attempt even if this check fails
-    } else if (count && count > 0) {
+    // Check for existing user with this email by trying to sign in
+    const { data: checkData } = await supabase.auth.signInWithPassword({
+      email,
+      password: 'dummy-password-for-check'
+    });
+    
+    // If the sign-in succeeds (unlikely with a dummy password, but possible if that's their actual password)
+    if (checkData?.user) {
       throw new Error('An account with this email already exists');
     }
     
+    // Attempt signup if no existing user
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
