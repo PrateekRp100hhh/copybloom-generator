@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { generateScript } from '@/lib/ai';
-import YoutubeScriptForm from './youtube/YoutubeScriptForm';
+import ContentForm from './youtube/YoutubeScriptForm';
 import ScriptResult from './youtube/ScriptResult';
 import { ScriptFormData } from '@/types/youtube';
 
-const YoutubeScriptGenerator: React.FC = () => {
+const ContentGenerator: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ const YoutubeScriptGenerator: React.FC = () => {
   const generateScriptHandler = async () => {
     // Validate form
     if (!formData.topic || !formData.audience || !formData.tone) {
-      setError("Please fill in all required fields to generate a script.");
+      setError("Please fill in all required fields to generate content.");
       return;
     }
 
@@ -53,7 +53,7 @@ const YoutubeScriptGenerator: React.FC = () => {
       
       setGeneratedScript(response);
     } catch (error: any) {
-      console.error('Error generating script:', error);
+      console.error('Error generating content:', error);
       setError(error.message || "Generation failed");
     } finally {
       setLoading(false);
@@ -91,10 +91,10 @@ const YoutubeScriptGenerator: React.FC = () => {
       <div className="bg-accent/30 p-4 rounded-lg mb-6">
         <h2 className="text-lg font-medium mb-2 flex items-center">
           <RefreshCw className="h-5 w-5 mr-2 text-primary" />
-          YouTube Script Generator
+          Content Generator
         </h2>
         <p className="text-sm text-muted-foreground">
-          Create professional scripts for viral videos using our Hook-Content-Outro framework with advanced storytelling elements.
+          Create professional content for your videos using our Hook-Content-Outro framework with advanced storytelling elements.
         </p>
       </div>
       
@@ -105,7 +105,7 @@ const YoutubeScriptGenerator: React.FC = () => {
         </div>
       )}
       
-      <YoutubeScriptForm 
+      <ContentForm 
         formData={formData}
         setFormData={setFormData}
         loading={loading}
@@ -127,4 +127,4 @@ const YoutubeScriptGenerator: React.FC = () => {
   );
 };
 
-export default YoutubeScriptGenerator;
+export default ContentGenerator;

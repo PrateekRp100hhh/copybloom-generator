@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import CopyGenerator from '@/components/CopyGenerator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Youtube, History, Film, Sparkles } from 'lucide-react';
+import { FileText, History, Film, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { getUserCampaigns, Campaign } from '@/lib/auth';
@@ -46,17 +46,17 @@ const Generator = () => {
             <div className="mb-6 bg-muted/30 rounded-lg p-4 border border-dashed flex items-center justify-between">
               <div className="flex-1 space-y-4">
                 <div className="flex items-center">
-                  <Youtube className="h-5 w-5 text-red-500 mr-3" />
+                  <FileText className="h-5 w-5 text-primary mr-3" />
                   <div>
                     <h3 className="font-medium">New: Content Creation Suite</h3>
-                    <p className="text-sm text-muted-foreground">Create professional scripts, reels ideas, and video concepts</p>
+                    <p className="text-sm text-muted-foreground">Create professional content, reels ideas, and video concepts</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Link to="/content-creation">
                     <Button variant="secondary" size="sm" className="flex items-center">
-                      <Youtube className="mr-1.5 h-4 w-4" />
-                      YouTube Scripts
+                      <FileText className="mr-1.5 h-4 w-4" />
+                      Content Generator
                     </Button>
                   </Link>
                   <Link to="/content-creation?tab=reels">

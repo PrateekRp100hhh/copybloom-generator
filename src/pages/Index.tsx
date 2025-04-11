@@ -1,8 +1,7 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, MessageSquare, Youtube, Check } from 'lucide-react'; 
+import { ArrowRight, Sparkles, MessageSquare, FileText, Check } from 'lucide-react'; 
 import { Link } from 'react-router-dom';
 import CopyGenerator from '@/components/CopyGenerator';
 
@@ -52,7 +51,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* New YouTube Script Generator Section */}
+        {/* New Content Creation Section */}
         <section className="py-12 bg-white">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-5 items-center">
@@ -60,14 +59,14 @@ const Index = () => {
                 <div className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800 mb-2">
                   New Feature
                 </div>
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900">Create Viral YouTube Scripts</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-gray-900">Create Engaging Content</h2>
                 <p className="text-gray-600">
-                  Generate professional, attention-grabbing scripts for your YouTube videos in seconds. 
-                  Our AI-powered script generator helps you create content that engages your audience and drives views.
+                  Generate professional, attention-grabbing content for your videos and social media in seconds. 
+                  Our AI-powered content generator helps you create material that engages your audience and drives views.
                 </p>
-                <Link to="/youtube-script">
+                <Link to="/content-generator">
                   <Button className="mt-2 bg-blue-600 hover:bg-blue-700 rounded-md">
-                    <Youtube className="mr-2 h-4 w-4" /> Try YouTube Script Generator
+                    <FileText className="mr-2 h-4 w-4" /> Try Content Generator
                   </Button>
                 </Link>
               </div>
@@ -75,14 +74,14 @@ const Index = () => {
                 <div className="relative aspect-video rounded-lg overflow-hidden border shadow-md">
                   <img 
                     src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0" 
-                    alt="YouTube Script Generator" 
+                    alt="Content Generator" 
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                     <div className="p-4 text-white">
                       <div className="flex items-center">
-                        <Youtube className="h-6 w-6 mr-2 text-red-500" />
-                        <span className="font-medium">Script Generator</span>
+                        <FileText className="h-6 w-6 mr-2 text-primary" />
+                        <span className="font-medium">Content Generator</span>
                       </div>
                     </div>
                   </div>

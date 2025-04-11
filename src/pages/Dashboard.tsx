@@ -9,7 +9,7 @@ import {
   MenubarMenu, 
   MenubarTrigger 
 } from '@/components/ui/menubar';
-import { History, PlusCircle, Youtube } from 'lucide-react';
+import { History, PlusCircle, FileText } from 'lucide-react';
 import { Campaign, getUserCampaigns, deleteCampaign, saveCampaign } from '@/lib/auth';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -104,9 +104,9 @@ const Dashboard = () => {
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Marketing Copy
                 </MenubarItem>
-                <MenubarItem onClick={() => navigate('/youtube-script')}>
-                  <Youtube className="mr-2 h-4 w-4" />
-                  YouTube Script
+                <MenubarItem onClick={() => navigate('/content-generator')}>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Content Generator
                 </MenubarItem>
               </MenubarContent>
             </MenubarMenu>

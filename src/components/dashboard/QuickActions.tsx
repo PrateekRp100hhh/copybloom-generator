@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, MessageSquare, Settings, Copy, Youtube, Film, Sparkles } from 'lucide-react';
+import { PlusCircle, MessageSquare, Settings, Copy, FileText, Film, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const QuickActions: React.FC = () => {
@@ -22,7 +22,7 @@ const QuickActions: React.FC = () => {
           Create New Copy
         </Button>
         <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/content-creation')}>
-          <Youtube className="mr-2 h-4 w-4" />
+          <FileText className="mr-2 h-4 w-4" />
           Content Creation
         </Button>
         <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/content-creation?tab=reels')}>

@@ -1,10 +1,10 @@
 
 import React from 'react';
 import Header from '@/components/Header';
-import YoutubeScriptGenerator from '@/components/YoutubeScriptGenerator';
+import ContentGenerator from '@/components/YoutubeScriptGenerator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const YoutubeScriptGeneratorPage = () => {
+const ContentGeneratorPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -12,17 +12,17 @@ const YoutubeScriptGeneratorPage = () => {
       <main className="flex-1 py-8">
         <div className="container px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">YouTube Script Generator</h1>
+            <h1 className="text-3xl font-bold mb-6">Content Generator</h1>
             
             <Card>
               <CardHeader>
-                <CardTitle>Create Viral YouTube Scripts</CardTitle>
+                <CardTitle>Create Engaging Content</CardTitle>
                 <CardDescription>
-                  Fill in the basic details about your video, and our AI will auto-generate an engaging script using the Hook-Content-Outro framework with advanced storytelling. Each key point will follow a 5-step storytelling structure for maximum viewer engagement.
+                  Fill in the basic details about your content, and our AI will auto-generate an engaging script using the Hook-Content-Outro framework with advanced storytelling. Each key point will follow a 5-step storytelling structure for maximum audience engagement.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <YoutubeScriptGenerator />
+                <ContentGenerator />
               </CardContent>
             </Card>
           </div>
@@ -40,4 +40,4 @@ const YoutubeScriptGeneratorPage = () => {
   );
 };
 
-export default YoutubeScriptGeneratorPage;
+export default ContentGeneratorPage;
