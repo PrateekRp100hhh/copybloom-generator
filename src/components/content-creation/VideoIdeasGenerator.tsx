@@ -16,7 +16,7 @@ type VideoIdea = {
 };
 
 const VideoIdeasGenerator: React.FC = () => {
-  const [niche, setNiche] = useState('');
+  const [niche, setNiche] = useState('general');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [videoIdeas, setVideoIdeas] = useState<VideoIdea[]>([]);
@@ -28,7 +28,7 @@ const VideoIdeasGenerator: React.FC = () => {
     
     try {
       const prompt = `
-        Generate 10 fresh and engaging YouTube video ideas ${niche ? `for the ${niche} niche` : ''}.
+        Generate 10 fresh and engaging YouTube video ideas ${niche !== 'general' ? `for the ${niche} niche` : 'across different niches'}.
         These ideas should be optimized for YouTube SEO and have viral potential.
         
         For each idea, provide:
@@ -111,7 +111,7 @@ const VideoIdeasGenerator: React.FC = () => {
               <SelectValue placeholder="Select a niche (or leave empty for general ideas)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All niches</SelectItem>
+              <SelectItem value="general">All niches</SelectItem>
               <SelectItem value="travel">Travel</SelectItem>
               <SelectItem value="food">Food & Cooking</SelectItem>
               <SelectItem value="lifestyle">Lifestyle</SelectItem>
