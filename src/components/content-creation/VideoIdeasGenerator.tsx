@@ -28,6 +28,7 @@ const VideoIdeasGenerator: React.FC = () => {
     
     try {
       const prompt = `
+        You are Gemini, an AI content strategist.
         Generate 10 fresh and engaging YouTube video ideas ${niche !== 'general' ? `for the ${niche} niche` : 'across different niches'}.
         These ideas should be optimized for YouTube SEO and have viral potential.
         
@@ -95,10 +96,10 @@ const VideoIdeasGenerator: React.FC = () => {
       <div className="bg-accent/30 p-4 rounded-lg">
         <h2 className="text-lg font-medium mb-2 flex items-center">
           <Sparkles className="h-5 w-5 mr-2 text-primary" />
-          Video Ideas Generator
+          Gemini-Powered Video Ideas Generator
         </h2>
         <p className="text-sm text-muted-foreground">
-          Get fresh video ideas optimized for YouTube SEO and audience engagement.
+          Get fresh video ideas optimized for YouTube SEO and audience engagement using Gemini AI.
           Filter by niche to get tailored suggestions for your channel.
         </p>
       </div>
