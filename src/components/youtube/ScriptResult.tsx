@@ -81,6 +81,11 @@ const ScriptResult: React.FC<ScriptResultProps> = ({
       .replace(/\n/g, '<br />');
   };
 
+  // Handler for script updates from the chat widget
+  const handleScriptUpdate = (updatedScript: string) => {
+    setGeneratedScript(updatedScript);
+  };
+
   return (
     <div className="mt-8 space-y-4">
       <div className="flex justify-between items-center">
@@ -138,8 +143,8 @@ const ScriptResult: React.FC<ScriptResultProps> = ({
       
       <div className="mt-6 border-t pt-6">
         <ScriptChatWidget
-          scriptContext={generatedScript}
-          topic={formData.topic}
+          originalScript={generatedScript}
+          onScriptUpdate={handleScriptUpdate}
         />
       </div>
     </div>
