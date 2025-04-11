@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import CopyGenerator from '@/components/CopyGenerator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Youtube, History } from 'lucide-react';
+import { Youtube, History, Film, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { getUserCampaigns, Campaign } from '@/lib/auth';
@@ -44,16 +44,40 @@ const Generator = () => {
             </div>
             
             <div className="mb-6 bg-muted/30 rounded-lg p-4 border border-dashed flex items-center justify-between">
-              <div className="flex items-center">
-                <Youtube className="h-5 w-5 text-red-500 mr-3" />
-                <div>
-                  <h3 className="font-medium">New: YouTube Script Generator</h3>
-                  <p className="text-sm text-muted-foreground">Create professional scripts for viral videos</p>
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center">
+                  <Youtube className="h-5 w-5 text-red-500 mr-3" />
+                  <div>
+                    <h3 className="font-medium">New: Content Creation Suite</h3>
+                    <p className="text-sm text-muted-foreground">Create professional scripts, reels ideas, and video concepts</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Link to="/content-creation">
+                    <Button variant="secondary" size="sm" className="flex items-center">
+                      <Youtube className="mr-1.5 h-4 w-4" />
+                      YouTube Scripts
+                    </Button>
+                  </Link>
+                  <Link to="/content-creation?tab=reels">
+                    <Button variant="outline" size="sm" className="flex items-center">
+                      <Film className="mr-1.5 h-4 w-4" />
+                      Reels Ideas
+                    </Button>
+                  </Link>
+                  <Link to="/content-creation?tab=ideas">
+                    <Button variant="outline" size="sm" className="flex items-center">
+                      <Sparkles className="mr-1.5 h-4 w-4" />
+                      Video Ideas
+                    </Button>
+                  </Link>
                 </div>
               </div>
-              <Link to="/youtube-script">
-                <Button variant="secondary">Try it now</Button>
-              </Link>
+              <div className="ml-4">
+                <Link to="/content-creation">
+                  <Button>Try it now</Button>
+                </Link>
+              </div>
             </div>
             
             {showHistory && campaigns.length > 0 && (
@@ -146,7 +170,7 @@ const Generator = () => {
                         title="YouTube Script"
                         description="Professional script template for viral videos"
                         imgSrc="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
-                        link="/youtube-script"
+                        link="/content-creation"
                       />
                       <TemplateCard 
                         title="Newsletter"

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 import { generateScript } from '@/lib/ai';
 import YoutubeScriptForm from './youtube/YoutubeScriptForm';
 import ScriptResult from './youtube/ScriptResult';
@@ -60,6 +60,11 @@ const YoutubeScriptGenerator: React.FC = () => {
     }
   };
 
+  const regenerateScript = async () => {
+    // Simply call the generation function again with the same params
+    await generateScriptHandler();
+  };
+
   const resetForm = () => {
     setFormData({
       topic: '',
@@ -83,7 +88,16 @@ const YoutubeScriptGenerator: React.FC = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Generate YouTube Script</h2>
+      <div className="bg-accent/30 p-4 rounded-lg mb-6">
+        <h2 className="text-lg font-medium mb-2 flex items-center">
+          <RefreshCw className="h-5 w-5 mr-2 text-primary" />
+          YouTube Script Generator
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Create professional scripts for viral videos using our Hook-Content-Outro framework with advanced storytelling elements.
+        </p>
+      </div>
+      
       {error && (
         <div className="bg-destructive/10 text-destructive p-3 rounded-md mb-4 flex items-center gap-2">
           <AlertCircle className="h-4 w-4" />
@@ -107,6 +121,7 @@ const YoutubeScriptGenerator: React.FC = () => {
         formData={formData}
         loading={loading}
         setLoading={setLoading}
+        regenerateScript={regenerateScript}
       />
     </div>
   );
