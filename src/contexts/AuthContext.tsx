@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
         if (session?.user) {
@@ -89,11 +89,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               localStorage.setItem('currentUser', JSON.stringify(savedUser));
               setUser(null);
             }
+          } else {
+            setIsLoading(false);
           }
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-      } finally {
         setIsLoading(false);
       }
     };
