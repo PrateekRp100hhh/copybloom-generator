@@ -39,6 +39,9 @@ export const login = async (email: string, password: string): Promise<AppUser> =
       createdAt: data.user.created_at
     };
     
+    // Save user to localStorage for offline access to campaigns
+    localStorage.setItem('currentUser', JSON.stringify(appUser));
+    
     return appUser;
   } catch (error) {
     console.error('Login error:', error);
@@ -48,14 +51,16 @@ export const login = async (email: string, password: string): Promise<AppUser> =
 
 export const signup = async (name: string, email: string, password: string): Promise<AppUser> => {
   try {
-    // Check for existing user with this email by trying to sign in
-    const { data: checkData } = await supabase.auth.signInWithPassword({
+    // Check if user exists with this email first
+    const { data: emailCheck } = await supabase.auth.signInWithOtp({
       email,
-      password: 'dummy-password-for-check'
+      options: {
+        shouldCreateUser: false
+      }
     });
     
-    // If the sign-in succeeds (unlikely with a dummy password, but possible if that's their actual password)
-    if (checkData?.user) {
+    // If we get a successful OTP request, it means the email exists
+    if (emailCheck?.user) {
       throw new Error('An account with this email already exists');
     }
     
@@ -91,6 +96,9 @@ export const signup = async (name: string, email: string, password: string): Pro
       createdAt: data.user.created_at
     };
     
+    // Save user to localStorage for offline access to campaigns
+    localStorage.setItem('currentUser', JSON.stringify(appUser));
+    
     return appUser;
   } catch (error) {
     console.error('Signup error:', error);
@@ -100,6 +108,14 @@ export const signup = async (name: string, email: string, password: string): Pro
 
 export const logout = async (): Promise<void> => {
   try {
+    // Keep the user data in localStorage for campaign access
+    // But mark as not logged in by setting a flag
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (currentUser.id) {
+      currentUser.isLoggedIn = false;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+    
     await supabase.auth.signOut();
   } catch (error) {
     console.error('Logout error:', error);
@@ -116,13 +132,19 @@ export const getCurrentUser = async (): Promise<AppUser | null> => {
     
     const user = data.session.user;
     
-    return {
+    // Create AppUser object
+    const appUser: AppUser = {
       id: user.id,
       name: user.user_metadata?.name || user.email?.split('@')[0] || '',
       email: user.email || '',
       isLoggedIn: true,
       createdAt: user.created_at
     };
+    
+    // Update localStorage with the current user data
+    localStorage.setItem('currentUser', JSON.stringify(appUser));
+    
+    return appUser;
   } catch (error) {
     console.error('Get current user error:', error);
     return null;

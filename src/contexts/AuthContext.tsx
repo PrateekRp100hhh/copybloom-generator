@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AppUser, getCurrentUser, login, signup, logout } from '@/lib/auth';
@@ -24,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.id);
         
         if (session?.user) {
@@ -39,9 +38,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           
           // Update state
           setUser(appUser);
+          // Save to localStorage to preserve user identity
+          localStorage.setItem('currentUser', JSON.stringify(appUser));
+          setIsLoading(false);
+        } else if (event === 'SIGNED_OUT') {
+          // On explicit sign out
+          const savedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (savedUser.id) {
+            // Keep user reference but mark as not logged in
+            savedUser.isLoggedIn = false;
+            localStorage.setItem('currentUser', JSON.stringify(savedUser));
+          }
+          setUser(null);
           setIsLoading(false);
         } else {
-          setUser(null);
+          // Check for saved user data
+          const savedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (savedUser.id && !savedUser.isLoggedIn) {
+            // We have a user that was previously logged out
+            // Keep null for auth state, but user data still accessible for history
+            setUser(null);
+          } else {
+            setUser(null);
+          }
           setIsLoading(false);
         }
       }
@@ -55,6 +74,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (data.session?.user) {
           const currentUser = await getCurrentUser();
           setUser(currentUser);
+        } else {
+          // Check if we have a user in localStorage
+          const savedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (savedUser.id && savedUser.isLoggedIn) {
+            // Try to restore session if we have a user that thinks they're logged in
+            const refreshed = await supabase.auth.refreshSession();
+            if (refreshed.data.session) {
+              const currentUser = await getCurrentUser();
+              setUser(currentUser);
+            } else {
+              // Session couldn't be refreshed, mark user as logged out
+              savedUser.isLoggedIn = false;
+              localStorage.setItem('currentUser', JSON.stringify(savedUser));
+              setUser(null);
+            }
+          }
         }
       } catch (error) {
         console.error('Error checking auth:', error);
@@ -95,15 +130,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleSignup = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      // First, try to check if the account already exists
-      // This uses the same approach as in auth.ts
-      const { data } = await supabase.auth.signInWithPassword({
+      // Check for existing account using OTP which is safer than 
+      // attempting a signin with a dummy password
+      const { data, error: otpError } = await supabase.auth.signInWithOtp({
         email,
-        password: 'dummy-password-for-check'
+        options: {
+          shouldCreateUser: false
+        }
       });
       
-      // If we get a successful sign-in, it means the email exists
-      if (data.user) {
+      // If OTP is successful, an email exists
+      if (data?.user || (otpError && otpError.message.includes('already'))) {
         toast({
           title: "Account already exists",
           description: "An account with this email already exists. Please log in instead.",
@@ -123,7 +160,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate('/dashboard');
     } catch (error: any) {
       // Handle errors with more details
-      // If the error is about an existing account, provide a clear message
       if (error.message?.includes('already') || error.message?.includes('duplicate') || error.message?.includes('exists')) {
         toast({
           title: "Account already exists",
