@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import YoutubeScriptGenerator from '@/components/YoutubeScriptGenerator';
+import ContentGenerator from '@/components/ContentGenerator';
 import ReelsIdeasGenerator from '@/components/content-creation/ReelsIdeasGenerator';
 import VideoIdeasGenerator from '@/components/content-creation/VideoIdeasGenerator';
 import { Film, Sparkles, Youtube } from 'lucide-react';
@@ -30,7 +30,7 @@ const ContentCreation = () => {
                   <TabsList className="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="youtube" className="flex items-center">
                       <Youtube className="mr-2 h-4 w-4" />
-                      YouTube Script
+                      Content Script
                     </TabsTrigger>
                     <TabsTrigger value="reels" className="flex items-center">
                       <Film className="mr-2 h-4 w-4" />
@@ -43,7 +43,7 @@ const ContentCreation = () => {
                   </TabsList>
                   
                   <TabsContent value="youtube">
-                    <YoutubeScriptGenerator />
+                    <ContentGenerator />
                   </TabsContent>
                   
                   <TabsContent value="reels">

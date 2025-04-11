@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Header from '@/components/Header';
-import ContentGenerator from '@/components/YoutubeScriptGenerator';
+import ContentGenerator from '@/components/ContentGenerator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ContentGeneratorPage = () => {

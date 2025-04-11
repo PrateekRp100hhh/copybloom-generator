@@ -13,7 +13,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ChatAssistant from "./pages/ChatAssistant";
 import ContentCreation from "./pages/ContentCreation";
-import ContentGeneratorPage from "./pages/YoutubeScriptGenerator";
+import ContentGenerator from "./pages/ContentGenerator";
 import GeminiGenerator from "./pages/GeminiGenerator";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Loader2 } from "lucide-react";
@@ -36,7 +36,7 @@ const App = () => (
             <Route path="/generator" element={<ProtectedComponent><Generator /></ProtectedComponent>} />
             <Route path="/templates" element={<ProtectedComponent><Templates /></ProtectedComponent>} />
             <Route path="/chat" element={<ProtectedComponent><ChatAssistant /></ProtectedComponent>} />
-            <Route path="/content-generator" element={<ProtectedComponent><ContentGeneratorPage /></ProtectedComponent>} />
+            <Route path="/content-generator" element={<ProtectedComponent><ContentGenerator /></ProtectedComponent>} />
             <Route path="/content-creation" element={<ProtectedComponent><ContentCreation /></ProtectedComponent>} />
             <Route path="/gemini" element={<ProtectedComponent><GeminiGenerator /></ProtectedComponent>} />
             
