@@ -1,3 +1,4 @@
+
 // Authentication library using Supabase
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -20,16 +21,20 @@ export interface Campaign {
 
 export const login = async (email: string, password: string): Promise<AppUser> => {
   try {
+    console.log("Login attempt for:", email);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
+      console.error("Login error from Supabase:", error);
       throw new Error(error.message);
     }
     
     if (!data.user) {
+      console.error("Login failed - no user returned");
       throw new Error('Login failed');
     }
 
+    console.log("Login successful for:", email);
     // Create an AppUser object from Supabase user
     const appUser: AppUser = {
       id: data.user.id,
@@ -51,20 +56,8 @@ export const login = async (email: string, password: string): Promise<AppUser> =
 
 export const signup = async (name: string, email: string, password: string): Promise<AppUser> => {
   try {
-    // Check if user exists with this email first
-    const { data: emailCheck } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: false
-      }
-    });
-    
-    // If we get a successful OTP request, it means the email exists
-    if (emailCheck?.user) {
-      throw new Error('An account with this email already exists');
-    }
-    
-    // Attempt signup if no existing user
+    console.log("Signup attempt for:", email);
+    // Try to sign up directly - Supabase will handle if the email already exists
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -76,6 +69,7 @@ export const signup = async (name: string, email: string, password: string): Pro
     });
     
     if (error) {
+      console.error("Signup error from Supabase:", error);
       // Check if the error is due to duplicate email
       if (error.message.includes('already') || error.message.includes('exists')) {
         throw new Error('An account with this email already exists');
@@ -83,10 +77,18 @@ export const signup = async (name: string, email: string, password: string): Pro
       throw new Error(error.message);
     }
     
+    // Check if the user needs to confirm their email
+    if (data.user && !data.session) {
+      console.log("Signup successful but email confirmation required");
+      throw new Error('Please check your email to confirm your account');
+    }
+    
     if (!data.user) {
+      console.error("Signup failed - no user returned");
       throw new Error('Signup failed');
     }
 
+    console.log("Signup successful for:", email);
     // Create an AppUser object from Supabase user
     const appUser: AppUser = {
       id: data.user.id,
@@ -124,13 +126,16 @@ export const logout = async (): Promise<void> => {
 
 export const getCurrentUser = async (): Promise<AppUser | null> => {
   try {
+    console.log("Getting current user from session");
     const { data } = await supabase.auth.getSession();
     
     if (!data.session?.user) {
+      console.log("No active session found");
       return null;
     }
     
     const user = data.session.user;
+    console.log("Found user in session:", user.email);
     
     // Create AppUser object
     const appUser: AppUser = {

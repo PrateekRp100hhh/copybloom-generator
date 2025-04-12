@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("AuthProvider initialized, setting up auth state listener");
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -69,27 +71,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // THEN check for existing session
     const initializeAuth = async () => {
       try {
+        console.log("Checking for existing session");
         const { data } = await supabase.auth.getSession();
         
         if (data.session?.user) {
+          console.log("Found existing session, getting current user");
           const currentUser = await getCurrentUser();
           setUser(currentUser);
         } else {
+          console.log("No existing session, checking localStorage");
           // Check if we have a user in localStorage
           const savedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
           if (savedUser.id && savedUser.isLoggedIn) {
+            console.log("Found user in localStorage, attempting to refresh session");
             // Try to restore session if we have a user that thinks they're logged in
             const refreshed = await supabase.auth.refreshSession();
             if (refreshed.data.session) {
+              console.log("Session refreshed successfully");
               const currentUser = await getCurrentUser();
               setUser(currentUser);
             } else {
+              console.log("Session refresh failed, marking user as logged out");
               // Session couldn't be refreshed, mark user as logged out
               savedUser.isLoggedIn = false;
               localStorage.setItem('currentUser', JSON.stringify(savedUser));
               setUser(null);
             }
           } else {
+            console.log("No user in localStorage or user is marked as logged out");
             setIsLoading(false);
           }
         }
@@ -109,6 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleLogin = async (email: string, password: string) => {
     setIsLoading(true);
     try {
+      console.log("Attempting login for:", email);
       const user = await login(email, password);
       setUser(user);
       toast({
@@ -116,12 +126,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "You have been logged in successfully",
       });
       navigate('/dashboard');
-    } catch (error) {
-      toast({
-        title: "Error logging in",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive"
-      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      
+      // Specific error handling
+      if (error.message && error.message.includes('not confirmed')) {
+        toast({
+          title: "Email not confirmed",
+          description: "Please check your email inbox and confirm your account before logging in.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error logging in",
+          description: error instanceof Error ? error.message : "Unknown error occurred",
+          variant: "destructive"
+        });
+      }
       throw error;
     } finally {
       setIsLoading(false);
@@ -131,35 +152,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleSignup = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Check for existing account using OTP which is safer than 
-      // attempting a signin with a dummy password
-      const { data, error: otpError } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          shouldCreateUser: false
-        }
-      });
-      
-      // If OTP is successful, an email exists
-      if (data?.user || (otpError && otpError.message.includes('already'))) {
-        toast({
-          title: "Account already exists",
-          description: "An account with this email already exists. Please log in instead.",
-          variant: "destructive"
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      // If we get here, proceed with signup
+      console.log("Attempting signup for:", email);
+      // Check for existing account (handled in the auth.ts library now)
       const user = await signup(name, email, password);
       setUser(user);
       toast({
         title: "Account created",
-        description: "Your account has been created successfully",
+        description: "Your account has been created successfully. Please check your email for a confirmation link.",
       });
       navigate('/dashboard');
     } catch (error: any) {
+      console.error("Signup error:", error);
       // Handle errors with more details
       if (error.message?.includes('already') || error.message?.includes('duplicate') || error.message?.includes('exists')) {
         toast({
@@ -182,6 +185,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleLogout = async () => {
     try {
+      console.log("Attempting logout");
       await logout();
       setUser(null);
       toast({

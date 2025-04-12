@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
-  const { login, signup, isLoading } = useAuth();
+  const { login, signup, isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -22,6 +25,41 @@ const Auth = () => {
     password: '',
     confirmPassword: ''
   });
+  const [processingEmailConfirmation, setProcessingEmailConfirmation] = useState(false);
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+    
+    // Check for email confirmation hash in URL
+    const checkEmailConfirmation = async () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('type=signup') || hash.includes('type=recovery')) {
+        setProcessingEmailConfirmation(true);
+        try {
+          // Process the confirmation link
+          await supabase.auth.getSession();
+          toast({
+            title: "Success",
+            description: "Your email has been confirmed. Please login.",
+          });
+        } catch (error) {
+          console.error("Error processing confirmation:", error);
+          toast({
+            title: "Error",
+            description: "There was an error confirming your email.",
+            variant: "destructive"
+          });
+        } finally {
+          setProcessingEmailConfirmation(false);
+        }
+      }
+    };
+    
+    checkEmailConfirmation();
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +75,15 @@ const Auth = () => {
     
     try {
       await login(loginData.email, loginData.password);
-    } catch (error) {
-      // Error handling is done in AuthContext
+    } catch (error: any) {
+      // Error handling is done in AuthContext, but we can add specific handling here
+      if (error.message && error.message.includes('email not confirmed')) {
+        toast({
+          title: "Email not confirmed",
+          description: "Please check your email to confirm your account before logging in.",
+          variant: "destructive"
+        });
+      }
       console.error("Login failed", error);
     }
   };
@@ -71,6 +116,24 @@ const Auth = () => {
       console.error("Signup failed", error);
     }
   };
+
+  if (processingEmailConfirmation) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header />
+        <main className="flex-1 flex items-center justify-center py-12 px-4">
+          <Card className="w-full max-w-md bg-white shadow-lg border-0 text-center">
+            <CardHeader>
+              <CardTitle>Processing Email Confirmation</CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
