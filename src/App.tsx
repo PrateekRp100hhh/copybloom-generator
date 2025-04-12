@@ -31,14 +31,14 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/auth" element={<Auth />} />
             
-            {/* Protected routes with individual protection */}
-            <Route path="/dashboard" element={<ProtectedComponent><Dashboard /></ProtectedComponent>} />
-            <Route path="/generator" element={<ProtectedComponent><Generator /></ProtectedComponent>} />
-            <Route path="/templates" element={<ProtectedComponent><Templates /></ProtectedComponent>} />
-            <Route path="/chat" element={<ProtectedComponent><ChatAssistant /></ProtectedComponent>} />
-            <Route path="/content-generator" element={<ProtectedComponent><ContentGenerator /></ProtectedComponent>} />
-            <Route path="/content-creation" element={<ProtectedComponent><ContentCreation /></ProtectedComponent>} />
-            <Route path="/gemini" element={<ProtectedComponent><GeminiGenerator /></ProtectedComponent>} />
+            {/* Routes with authentication check disabled */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/generator" element={<Generator />} />
+            <Route path="/templates" element={<Templates />} />
+            <Route path="/chat" element={<ChatAssistant />} />
+            <Route path="/content-generator" element={<ContentGenerator />} />
+            <Route path="/content-creation" element={<ContentCreation />} />
+            <Route path="/gemini" element={<GeminiGenerator />} />
             
             {/* Catch all route */}
             <Route path="*" element={<NotFound />} />
@@ -51,24 +51,14 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Protected component that checks authentication
+// Protected component (now bypassed, but kept for future reference)
 import { useAuth } from "./contexts/AuthContext";
 
 const ProtectedComponent = ({ children }: { children: React.ReactNode }) => {
+  // This function is kept but not used in routes anymore
   const { isAuthenticated, isLoading } = useAuth();
   
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" />;
-  }
-  
+  // Always allow access by returning children directly
   return <>{children}</>;
 };
 
