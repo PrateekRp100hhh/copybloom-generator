@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Copy, Loader2, RefreshCw, Sparkles, Wand2 } from 'lucide-react';
+import { AlertCircle, Copy, Loader2, MessageSquare, RefreshCw, Sparkles, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 import { generateGeminiContent } from '@/lib/ai';
 
 type VideoIdea = {
@@ -17,6 +18,7 @@ type VideoIdea = {
 
 const VideoIdeasGenerator: React.FC = () => {
   const [niche, setNiche] = useState('general');
+  const [contextPrompt, setContextPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [videoIdeas, setVideoIdeas] = useState<VideoIdea[]>([]);
@@ -27,10 +29,17 @@ const VideoIdeasGenerator: React.FC = () => {
     setError(null);
     
     try {
+      const contextInfo = contextPrompt ? 
+        `Additional context from user: ${contextPrompt}
+         Please use this context to personalize the video ideas.` : 
+        '';
+        
       const prompt = `
         You are Gemini, an AI content strategist.
         Generate 10 fresh and engaging YouTube video ideas ${niche !== 'general' ? `for the ${niche} niche` : 'across different niches'}.
         These ideas should be optimized for YouTube SEO and have viral potential.
+        
+        ${contextInfo}
         
         For each idea, provide:
         1. A catchy title that would work well for YouTube
@@ -100,16 +109,16 @@ const VideoIdeasGenerator: React.FC = () => {
         </h2>
         <p className="text-sm text-muted-foreground">
           Get fresh video ideas optimized for YouTube SEO and audience engagement using Gemini AI.
-          Filter by niche to get tailored suggestions for your channel.
+          Filter by niche and add context to get tailored suggestions for your channel.
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="niche">Content Niche (Optional)</Label>
+          <Label htmlFor="niche">Content Niche</Label>
           <Select value={niche} onValueChange={setNiche}>
             <SelectTrigger id="niche" className="mt-1.5">
-              <SelectValue placeholder="Select a niche (or leave empty for general ideas)" />
+              <SelectValue placeholder="Select a niche" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="general">All niches</SelectItem>
@@ -124,6 +133,20 @@ const VideoIdeasGenerator: React.FC = () => {
               <SelectItem value="education">Education</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        
+        <div>
+          <Label htmlFor="contextPrompt" className="flex items-center">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Additional Context (Optional)
+          </Label>
+          <Textarea
+            id="contextPrompt"
+            value={contextPrompt}
+            onChange={(e) => setContextPrompt(e.target.value)}
+            placeholder="Add specific details, your channel style, or any additional context for more personalized ideas..."
+            className="mt-1.5 min-h-[100px]"
+          />
         </div>
 
         {error && (
